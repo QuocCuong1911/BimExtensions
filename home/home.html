@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+    <h1>DANH SÁCH SẢN PHẨM</h1>
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table id="customers">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60%;">
+                    <col style="width: 10%;">
+                    <col style="width: 5%;">
+                </colgroup>
+                <tr>
+                    <th>ID</th>
+                    <th>Mã Tìm</th>
+                    <th>Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Xóa</th>
+                </tr>
+    
+            </table>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <form action="" class="search-bar">
+            <input type="search" name="search" pattern=".*\S.*" required placeholder="Tìm kiếm sản phẩm...">
+            <button class="search-btn" type="submit">
+                <span>Tìm kiếm</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="crud-container">
+
+        <div class="input-container">
+            <div class="input-field">
+                <label for="id-sanpham">ID
+                    <span class="hint">TỰ ĐỘNG</span>
+                </label>
+                <input type="text" id="id-sanpham" placeholder="ID" disabled>
+            </div>
+            <div class="input-field">
+                <label for="ma-tim">Mã tìm
+                    <span class="hint">VD: C122XL</span>
+                </label>
+                <input type="text" id="ma-tim" placeholder="Mã tìm">
+            </div>
+            <div class="input-field">
+                <label for="ten-hien-thi">Tên hiển thị
+                    <span class="hint">VD: C122 Áo trắng trơn cổ trụ XL</span>
+                </label>
+                <input type="text" id="ten-hien-thi" placeholder="Tên hiển thị">
+            </div>
+            <div class="input-field">
+                <label for="don-gia">Đơn giá
+                    <span class="hint">VD: 280</span>
+                </label>
+                <input type="text" id="don-gia" placeholder="Đơn giá">
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <!-- HTML !-->
+            <button class="button-them" role="button">Thêm</button>
+            <button class="button-sua" role="button">Sửa</button>
+            <button class="button-nhapex" role="button">Nhập Excel</button>
+            <input type="file" id="file-input" accept=".xlsx" style="display: none;" />
+            <button class="button-taiex" role="button">Tải Excel</button>
+            <button class="button-xoatoanbo" role="button">Xóa Toàn bộ</button>
+        </div>
+    </div>
+    <script src="home.js"></script>
+    <script src="/libary/xlsx.full.min.js"></script>
+
+</body>
+
+</html>
