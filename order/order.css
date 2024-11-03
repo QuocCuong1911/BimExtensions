@@ -1,0 +1,223 @@
+body {
+    font-family: Arial, sans-serif !important;
+    padding: 0 20px 0px 20px;
+    width: 650px;
+  }
+
+h1{
+    margin: 5px;
+    text-align: center;
+}
+
+.order-container {
+    position: relative !important;  /* Để nút con có thể định vị tuyệt đối bên trong */
+    max-height: 450px;
+    overflow-y: auto;
+    width: 650px;
+    height: 450px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.list-products{
+    list-style: none;
+    padding-left: 20px;
+}
+
+.product-order{
+    margin: 10px 0 10px 0;
+}
+.product-name{
+    font-family: Arial, sans-serif !important;
+    font-size: 16px;
+    display: inline-block;
+    text-align: left;
+    border: 1px solid blue; /* Tạo viền dày 1px, màu xanh */
+    padding: 11px;           /* Khoảng cách giữa viền và nội dung */
+    border-top-left-radius: 45px; /* Bo tròn góc trên bên trái */
+    border-bottom-left-radius: 45px; /* Bo tròn góc dưới bên trái */     /* Tùy chọn bo góc viền */
+    width: 330px;
+
+}
+
+.price-product{
+    -moz-appearance: textfield; /* Firefox */
+    -webkit-appearance: none; /* Safari và Chrome */
+    appearance: none; /* Chuẩn chung */
+    width: 130px;
+    padding: 11px;
+    border: 1px solid blue;
+    font-size: 15px;
+}
+
+.quantity{
+    width: 70px;
+    padding: 11px;
+    border: 1px solid blue;
+    font-size: 15px;
+}
+
+.price-product::-webkit-outer-spin-button,
+.price-product::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Ẩn các nút tăng giảm trong Chrome và Safari */
+    margin: 0;
+}
+
+.delete-product {
+    background-color: #ff4d4d; /* Màu nền */
+    color: white; /* Màu biểu tượng */
+    border: none;
+    border-radius: 0 45px 45px 0; /* Bo tròn 2 góc bên phải */
+    padding: 12px;
+    width: 50px;
+    cursor: pointer;
+
+    transition: background-color 0.3s; /* Hiệu ứng mượt khi hover */
+}
+
+.delete-product:hover {
+    background-color: #e60000; /* Thay đổi màu khi hover */
+}
+
+.fa-trash{
+    font-size: 17px;
+}
+
+
+.second-container {
+    display: flex;
+    align-items: center;  /* Căn giữa theo chiều dọc */
+    gap: 20px;            /* Khoảng cách giữa các phần tử */
+    font-family: Arial, sans-serif !important;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.total-box {
+    display: flex;
+    align-items: center;   /* Căn giữa các total-item theo chiều dọc */
+    gap: 20px;             /* Khoảng cách giữa các total-item */
+    width: 100%;
+    border: 1px solid rgb(34, 218, 5);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-item {
+    display: flex;
+    align-items: center;   /* Căn giữa nội dung trong total-item theo chiều dọc */
+    gap: 10px;             /* Khoảng cách giữa span và input */
+}
+
+.total-item span {
+    margin-bottom: 0;      /* Xóa khoảng cách phía dưới để span nằm ngang với input */
+}
+
+
+.total-item input {
+    width: 100%; /* Chiều rộng của input sẽ chiếm hết không gian có sẵn */
+    padding: 5px; /* Thêm khoảng cách bên trong cho ô input */
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+}
+
+.voucher-box {
+    flex: 1; /* Chiếm ít không gian hơn so với .total-box */
+    display: flex;
+    width: 40%;
+    height: 90px;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa các phần tử bên trong .voucher-box */
+    border: 1px solid blue;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-item input{
+    font-weight: bolder;
+    text-align: center;
+    color: #109a17;
+}
+.discount input,
+.voucher-box input {
+    width: 100px; /* Đặt chiều rộng cho các ô input */
+    font-size: 20px;
+    text-align: center;
+}
+
+.three-container {
+    display: flex;
+    justify-content: space-between; /* Đặt khoảng cách đều giữa các phần tử */
+    align-items: center; /* Canh giữa theo chiều dọc */
+}
+
+.discount {
+    flex: 1; /* Tạo không gian đều cho phần discount */
+}
+
+/*  */
+.shipping-fee {
+    display: flex;
+    align-items: center;  /* Căn giữa các phần tử theo chiều dọc */
+    gap: 10px;            /* Khoảng cách giữa các phần tử */
+}
+
+.shipping-fee span {
+    margin-right: 10px;   /* Khoảng cách giữa span và các tùy chọn */
+}
+
+.shipping-options {
+    display: flex;
+    gap: 6px;             /* Khoảng cách giữa các tùy chọn */
+}
+
+.shipping-options label {
+    margin-left: 0px;     /* Khoảng cách giữa input và label */
+}
+
+
+/* CSS */
+.add-button{
+    align-items: center;
+    appearance: none;
+    background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+    border: 0;
+    border-radius: 6px;
+    box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: "JetBrains Mono",monospace;
+    height: 48px;
+    width: 200px;
+    justify-content: center;
+    line-height: 1;
+    list-style: none;
+    overflow: hidden;
+    padding-left: 18px;
+    padding-right: 18px;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    transition: box-shadow .15s,transform .15s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    will-change: box-shadow,transform;
+    font-size: 18px;
+  }
+  
+  .add-button:focus {
+    box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+  }
+  
+  .add-button:hover {
+    box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+    transform: translateY(-2px);
+  }
+  
+  .add-button:active {
+    box-shadow: #3c4fe0 0 3px 7px inset;
+    transform: translateY(2px);
+  }

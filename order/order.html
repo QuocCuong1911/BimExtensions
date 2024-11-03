@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="order.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Lên Đơn Hàng</h1>
+    <div class="order-container">
+        <ul class="list-products">
+            <li class="product-order">
+                <div class="product-item">
+                    <input type="text" placeholder="Tên sản phẩm" class="product-name"></input>
+                    <input class="price-product" placeholder="giá" type="number">
+                    <input class="quantity" placeholder="SL" min="1" type="number">
+                    <button class="delete-product">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </li>
+           
+        </ul>
+        
+    </div>
+
+    <div class="second-container">
+        <div class="total-box">
+            <div class="total-item">
+                <span>Tổng số sản phẩm</span>
+                <input type="number" value="100" disabled>
+            </div>
+            <div class="total-item">
+                <span>Thành tiền</span>
+                <input type="number" value="9999" disabled>
+            </div>
+        </div>
+        <!-- HTML !-->
+        <button class="add-button" role="button">Thêm sản phẩm</button>
+
+    </div>
+
+    <div class="three-container">
+        <div class="voucher-box">
+            <span>Voucher:</span>
+            <input type="number">
+        </div>
+        <div class="discount">
+            <span>Giảm giá:</span>
+            <input type="number">
+        </div>
+
+        <div class="shipping-fee">
+            <span>Ship</span>
+            <div class="shipping-options">
+                <input type="radio" id="dontinh" name="phi-ship" value="30">
+                <label for="dontinh">30</label>
+                <input type="radio" id="noithanh25" name="phi-ship" value="25">
+                <label for="noithanh25">25</label>
+                <input type="radio" id="noithanh20" name="phi-ship" value="20">
+                <label for="noithanh20">20</label>
+                <input type="radio" id="freeship" name="phi-ship" value="0">
+                <label for="freeship">0</label>
+            </div>
+        </div>       
+    </div>
+    <script src="order.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Product Management Extension",
+    "version": "1.0",
+    "description": "Manage products with a centered popup window.",
+    "permissions": ["storage", "system.display", "activeTab"], 
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["scripts/content.js"]
+        }
+    ],
+    "commands": {
+      "open_order_window": {
+          "suggested_key": {
+              "default": "Ctrl+B"
+          },
+          "description": "Mở cửa sổ order"
+      }
+  },
+    "action": {
+      "default_title": "Open Product Manager"
+    }
+  }
