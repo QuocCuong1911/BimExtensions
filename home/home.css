@@ -4,9 +4,64 @@ body {
   text-align: left;  
 }
 
-h1 {
+.header {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Căn giữa nội dung */
+  padding: 10px 20px;
+  position: relative;
+}
+
+.home-icon {
+  position: absolute;
+  left: 20px; /* Đặt icon ở bên trái */
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  width: 30px;
+  transition: width 0.3s ease;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px black solid;
+}
+
+.home-icon:hover {
+  width: 110px;
+}
+
+.icon {
+  font-size: 20px;
+  color: #333;
+}
+
+.text {
+  margin-left: 5px;
+  font-size: 16px;
+  color: #333;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.home-icon:hover .text {
+  opacity: 1;
+}
+
+/* Thiết kế h1 để trông chuyên nghiệp hơn */
+.header h1 {
   font-size: 24px;
+  font-weight: bold;
+  color: #333;
   text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif; /* Font chữ chuyên nghiệp */
+  letter-spacing: 1px; /* Giãn chữ */
+  text-transform: uppercase;
 }
 .table-container{
   min-height: 500px;

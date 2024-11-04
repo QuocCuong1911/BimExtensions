@@ -3,7 +3,7 @@
     "name": "Product Management Extension",
     "version": "1.0",
     "description": "Manage products with a centered popup window.",
-    "permissions": ["storage", "system.display", "activeTab"], 
+    "permissions": ["storage", "system.display", "activeTab", "tabs"], 
     "background": {
       "service_worker": "background.js"
     },

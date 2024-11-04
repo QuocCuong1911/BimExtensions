@@ -2,6 +2,23 @@
 let currentEditProduct = null;
 let currentId = 1; // Khởi tạo ID bắt đầu từ 1
 
+document.querySelector('.home-icon').addEventListener('click', function() {
+    const homeWidth = 700;  // Độ rộng cho home
+    const homeHeight = 800;  // Độ cao cho home
+
+    chrome.windows.create({
+        url: chrome.runtime.getURL("order/order.html"),
+        type: "popup",
+        width: homeWidth,
+        height: homeHeight,
+        top: Math.round((screen.height - homeHeight) / 2),  // Căn giữa theo chiều dọc
+        left: Math.round((screen.width - homeWidth) / 2)    // Căn giữa theo chiều ngang
+    }, function() {
+        // Đóng trang order sau khi mở trang home
+        window.close();
+    });
+});
+
 // Hàm hiển thị dữ liệu sản phẩm từ local storage
 function displayProducts() {
     chrome.storage.local.get("productList", (data) => {

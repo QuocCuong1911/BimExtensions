@@ -14,61 +14,81 @@
 </head>
 
 <body>
-    <h1>Lên Đơn Hàng</h1>
+    <div class="header">
+        <div class="home-icon">
+            <span class="icon"><i class="fa-solid fa-house"></i></span>
+            <span class="text">Trang chủ</span>
+        </div>
+        <h1>Lên Đơn Hàng</h1>
+    </div>
     <div class="order-container">
+        <div class="title-table">
+            <div class="name-title">
+                <span>Tên sản phẩm</span>
+            </div>
+            <div class="price-title">
+                <span>Giá</span>
+            </div>
+            <div class="quantity-title">
+                <span>Số lượng</span>
+            </div>
+        </div>
         <ul class="list-products">
-            <li class="product-order">
-                <div class="product-item">
-                    <input type="text" placeholder="Tên sản phẩm" class="product-name"></input>
-                    <input class="price-product" placeholder="giá" type="number">
-                    <button class="delete-product">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            </li>
-            <div class="add-button">+</div>
+
         </ul>
-        
     </div>
 
     <div class="second-container">
         <div class="total-box">
             <div class="total-item">
                 <span>Tổng số sản phẩm</span>
-                <input type="number" value="100" disabled>
+                <input id="total-product-item" type="number" readonly>
             </div>
             <div class="total-item">
                 <span>Thành tiền</span>
-                <input type="number" value="9999" disabled>
+                <input id="total-price-item" type="text"  readonly>
             </div>
         </div>
-        <div class="voucher-box">
-            <span>Voucher:</span>
-            <input type="number">
-        </div>
+        <!-- HTML !-->
+        <button class="add-button" role="button">Thêm sản phẩm</button>
+
     </div>
 
     <div class="three-container">
+        <div class="voucher-box">
+            <span>Voucher:</span>
+            <input id="voucher-item" type="number" min="0" value="0">
+        </div>
         <div class="discount">
             <span>Giảm giá:</span>
-            <input type="number">
+            <input id="discount-item" type="number" min="0" value="0">
         </div>
 
         <div class="shipping-fee">
             <span>Ship</span>
             <div class="shipping-options">
-                <input type="radio" id="dontinh" name="phi-ship" value="30">
+                <input type="radio" id="dontinh" name="phi-ship" value="30" checked>
                 <label for="dontinh">30</label>
                 <input type="radio" id="noithanh25" name="phi-ship" value="25">
                 <label for="noithanh25">25</label>
                 <input type="radio" id="noithanh20" name="phi-ship" value="20">
                 <label for="noithanh20">20</label>
                 <input type="radio" id="freeship" name="phi-ship" value="0">
-                <label for="freeship">0</label>
+                <label for="frees   hip">0</label>
             </div>
         </div>
+    </div>
+
+    <div class="four-container">
+        <div class="search-bar-order">
+            <input type="text" placeholder="Search..." id="search-input"/>
+            <span class="search-icon">🔍</span>
+            <div id="suggestions" class="suggestions"></div>
+        </div>
         <div class="create-order">
-            <button>Lên đơn</button>
+           
+            <button class="create-btn" role="button">Lên Đơn</button>
+
         </div>
     </div>
     <script src="order.js"></script>
