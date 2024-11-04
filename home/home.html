@@ -60,13 +60,13 @@
             </div>
             <div class="input-field">
                 <label for="ma-tim">Mã tìm
-                    <span class="hint">VD: C122XL</span>
+                    <span class="hint">VD: C122</span>
                 </label>
                 <input type="text" id="ma-tim" placeholder="Mã tìm">
             </div>
             <div class="input-field">
                 <label for="ten-hien-thi">Tên hiển thị
-                    <span class="hint">VD: C122 Áo trắng trơn cổ trụ XL</span>
+                    <span class="hint">VD: Áo trắng trơn cổ trụ</span>
                 </label>
                 <input type="text" id="ten-hien-thi" placeholder="Tên hiển thị">
             </div>
@@ -86,6 +86,24 @@
             <input type="file" id="file-input" accept=".xlsx" style="display: none;" />
             <button class="button-taiex" role="button">Tải Excel</button>
             <button class="button-xoatoanbo" role="button">Xóa Toàn bộ</button>
+        </div>
+
+        <div class="size-container">
+            <h2>Chọn size của sản phẩm</h2>
+            <div class="size-product">
+                <input type="checkbox" id="M" name="size" value="M">
+                <label for="vehicle1"> M </label><br>
+                <input type="checkbox" id="L" name="size" value="L">
+                <label for="vehicle1"> L </label><br>
+                <input type="checkbox" id="XL" name="size" value="XL">
+                <label for="vehicle1"> XL </label><br>
+                <input type="checkbox" id="2XL" name="size" value="2XL">
+                <label for="vehicle1"> 2XL </label><br>
+                <input type="checkbox" id="3XL" name="size" value="3XL">
+                <label for="vehicle1"> 3XL </label><br>
+            </div>
+            <button class="btn-confirm" id="confirm-size">Xác nhận</button>
+            <button class="cancel-size" id="cancel-size">Hủy</button>
         </div>
     </div>
     <script src="home.js"></script>

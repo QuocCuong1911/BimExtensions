@@ -66,6 +66,76 @@ function displayProducts() {
     });
 }
 
+function showSizeSelector() {
+    const sizeContainer = document.querySelector('.size-container');
+    sizeContainer.classList.add('show'); // Hiển thị phần chọn kích thước
+}
+
+function cancelSizeSelection() {
+    const sizeContainer = document.querySelector('.size-container');
+    const checkboxes = document.querySelectorAll('.size-product input[type="checkbox"]');
+    
+    // Bỏ chọn tất cả các checkbox
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    // Ẩn phần chọn kích thước
+    sizeContainer.classList.remove('show');
+}
+
+document.getElementById("cancel-size").addEventListener("click", cancelSizeSelection);
+// Hàm thêm sản phẩm
+// function addProduct() {
+//     const maTim = document.getElementById("ma-tim").value.trim();
+//     const tenHienThi = document.getElementById("ten-hien-thi").value.trim();
+//     const donGia = document.getElementById("don-gia").value.trim();
+//     const id = currentId; // Lấy ID hiện tại
+
+//     // Kiểm tra nếu các trường không bị bỏ trống
+//     if (!maTim || !tenHienThi || !donGia) {
+//         alert("Vui lòng điền đầy đủ thông tin sản phẩm.");
+//         return;
+//     }
+
+//     // Hiện phần chọn kích thước
+//     showSizeSelector();
+
+//     // Lắng nghe sự kiện cho nút xác nhận trong phần chọn kích thước
+//     const confirmButton = document.getElementById("confirm-size"); // Nút xác nhận
+//     confirmButton.onclick = function() {
+//         const selectedSizes = Array.from(document.querySelectorAll('.size-product input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
+        
+//         if (selectedSizes.length === 0) {
+//             alert("Vui lòng chọn ít nhất một kích thước.");
+//             return;
+//         }
+
+//         // Danh sách sản phẩm mới
+//         const newProducts = selectedSizes.map(size => ({
+//             id: currentId++, // Tăng ID
+//             maTim: `${maTim}-${size}`, // Thêm size vào mã tìm
+//             tenHienThi: `${tenHienThi} ${size}`, // Thêm size vào tên hiển thị
+//             donGia
+//         }));
+
+//         // Lưu sản phẩm mới vào danh sách
+//         chrome.storage.local.get("productList", (data) => {
+//             const productList = data.productList || [];
+//             productList.push(...newProducts); // Thêm nhiều sản phẩm vào danh sách
+//             chrome.storage.local.set({ productList }, () => {
+//                 displayProducts(); // Cập nhật bảng
+//             });
+//         });
+
+//         // Xóa dữ liệu trong ô input sau khi thêm
+//         clearInputs();
+        
+//         // Ẩn phần chọn kích thước
+//         const sizeContainer = document.querySelector('.size-container');
+//         sizeContainer.classList.remove('show');
+//     };
+// }
 // Hàm thêm sản phẩm
 function addProduct() {
     const maTim = document.getElementById("ma-tim").value.trim();
@@ -79,27 +149,46 @@ function addProduct() {
         return;
     }
 
-    // Kiểm tra nếu ID đã tồn tại
-    chrome.storage.local.get("productList", (data) => {
-        const productList = data.productList || [];
-        const existingProduct = productList.find(product => product.id == id); // Tìm sản phẩm theo ID
+    // Hiện phần chọn kích thước
+    showSizeSelector();
 
-        if (existingProduct) {
-            alert("ID này đã tồn tại. Vui lòng nhập ID khác.");
-            return; // Không cho phép thêm nếu ID đã tồn tại
+    // Lắng nghe sự kiện cho nút xác nhận trong phần chọn kích thước
+    const confirmButton = document.getElementById("confirm-size"); // Nút xác nhận
+    confirmButton.onclick = function() {
+        const selectedSizes = Array.from(document.querySelectorAll('.size-product input[type="checkbox"]:checked')).map(checkbox => checkbox.value);
+        
+        if (selectedSizes.length === 0) {
+            alert("Vui lòng chọn ít nhất một kích thước.");
+            return;
         }
 
-        // Thêm sản phẩm mới
-        const newProduct = { id: currentId++, maTim, tenHienThi, donGia }; // Tạo sản phẩm mới với ID tự tăng
-        productList.push(newProduct);
-        chrome.storage.local.set({ productList }, () => {
-            displayProducts(); // Cập nhật bảng
+        // Danh sách sản phẩm mới
+        const newProducts = selectedSizes.map(size => ({
+            id: currentId++, // Tăng ID
+            maTim: `${maTim}-${size}`, // Thêm size vào mã tìm
+            tenHienThi: `${maTim} ${tenHienThi} ${size}`, // Nối mã tìm vào tên hiển thị với size
+            donGia
+        }));
+
+        // Lưu sản phẩm mới vào danh sách
+        chrome.storage.local.get("productList", (data) => {
+            const productList = data.productList || [];
+            productList.push(...newProducts); // Thêm nhiều sản phẩm vào danh sách
+            chrome.storage.local.set({ productList }, () => {
+                displayProducts(); // Cập nhật bảng
+            });
         });
 
         // Xóa dữ liệu trong ô input sau khi thêm
         clearInputs();
-    });
+        
+        // Ẩn phần chọn kích thước
+        const sizeContainer = document.querySelector('.size-container');
+        sizeContainer.classList.remove('show');
+    };
 }
+document.querySelector(".button-them").addEventListener("click", addProduct);
+
 
 
 // Hàm sửa sản phẩm
@@ -175,6 +264,11 @@ function clearInputs() {
     document.getElementById("ma-tim").value = "";
     document.getElementById("ten-hien-thi").value = "";
     document.getElementById("don-gia").value = "";
+}
+
+function showSizeSelector() {
+    const sizeContainer = document.querySelector('.size-container');
+    sizeContainer.classList.add('show'); // Hiển thị phần chọn kích thước
 }
 
 // Lắng nghe sự kiện khi nhấn nút "Thêm"

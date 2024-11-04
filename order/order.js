@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
         newProduct.innerHTML = `
         <div class="product-item">
             <input type="text" placeholder="Tên sản phẩm" class="product-name">
-            <input class="price-product" value="1" placeholder="giá" type="number">
+            <input class="price-product" min="0" value="1" placeholder="giá" type="number">
             <input class="quantity" value="1" min="1" placeholder="SL" type="number">
             <button class="delete-product">
                 <i class="fa-solid fa-trash"></i>
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         newLi.innerHTML = `
                         <div class="product-item">
                             <input type="text" value="${product.tenHienThi}" class="product-name"/>
-                            <input class="price-product" value="${product.donGia}" type="number" />
+                            <input class="price-product" min="0" value="${product.donGia}" type="number" />
                             <input class="quantity" value="1" min="1" type="number" />
                             <button class="delete-product">
                                 <i class="fa-solid fa-trash"></i>
@@ -144,11 +144,21 @@ function updateTotals() {
 
     // Tính tổng số lượng và tổng giá
     document.querySelectorAll(".product-order").forEach(product => {
-        const price = parseFloat(product.querySelector(".price-product").value) || 0;
-        const quantity = parseInt(product.querySelector(".quantity").value) || 0;
+        // Lấy giá và số lượng từ các trường đầu vào dưới dạng chuỗi ban đầu
+        let priceString = product.querySelector(".price-product").value;
+        let quantity = parseInt(product.querySelector(".quantity").value) || 0;
 
-        totalQuantity += quantity;
-        totalPrice += price * quantity;
+        // Chuyển đổi giá trị của `price` sang số thực
+        let price = parseFloat(priceString);
+
+        // In giá trị ban đầu của chuỗi và sau khi chuyển đổi
+        console.log("Original Price String:", priceString, "Parsed Price:", price, "Quantity:", quantity);
+
+        // Kiểm tra giá trị của `price`
+        if (!isNaN(price)) {
+            totalQuantity += quantity;
+            totalPrice += price * quantity;
+        }
     });
 
     // Lấy giá trị voucher và giảm giá
@@ -174,8 +184,10 @@ function updateTotals() {
 
     // Cập nhật giao diện
     document.getElementById("total-product-item").value = totalQuantity;
-    document.getElementById("total-price-item").value = totalPrice.toFixed(0) + 'K'; // Thêm ' K' vào tổng tiền
+    document.getElementById("total-price-item").value = totalPrice.toFixed(0) + 'K'; // Thêm 'K' vào tổng tiền
 }
+
+
 
 // Lắng nghe sự kiện cho voucher và giảm giá
 document.getElementById("voucher-item").addEventListener("input", updateTotals);
@@ -199,3 +211,62 @@ document.querySelectorAll(".quantity").forEach(input => {
 document.querySelectorAll(".price-product").forEach(input => {
     input.addEventListener("input", updateTotals());
 });
+
+//Lên đơn
+document.querySelector('.create-btn').addEventListener('click', function() {
+    // Kiểm tra nếu không có sản phẩm nào
+    const products = document.querySelectorAll('.product-order');
+    if (products.length === 0) {
+        alert("Không có sản phẩm nào để lên đơn!");
+        return; // Dừng lại nếu không có sản phẩm
+    }
+
+    let productText = "";
+    let totalExpression = "";
+    let totalAmount = 0;
+    const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
+    const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
+    const discount = parseFloat(document.getElementById("discount-item").value) || 0;
+
+    products.forEach((product) => {
+        const name = product.querySelector('.product-name').value;
+        const priceString = product.querySelector('.price-product').value;
+        const price = parseFloat(priceString) || 0; // Chuyển đổi sang số
+        const quantity = parseInt(product.querySelector('.quantity').value) || 1;
+
+        const productTotal = price * quantity;
+        totalAmount += productTotal;
+
+        if (quantity > 1) {
+            productText += `${name} ${price} ${quantity} cái\n`;
+            totalExpression += `${price}+`.repeat(quantity);
+        } else {
+            productText += `${name} ${price}\n`;
+            totalExpression += `${price}+`;
+        }
+    });
+
+    totalExpression = totalExpression.slice(0, -1); // Loại bỏ dấu "+" cuối cùng
+
+    totalExpression += `+${shipFee}ship`;
+    if (voucher > 0) totalExpression += `-${voucher}(voucher)`;
+    if (discount > 0) totalExpression += `-${discount}( )`;
+
+    let finalTotal = totalAmount + shipFee - voucher - discount;
+
+    let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
+    finalText += `TC : ${totalExpression} = ${finalTotal}K`;
+
+    if (shipFee === 0) {
+        finalText += " (miễn ship)";
+    }
+
+    finalText += " ạ";
+
+    navigator.clipboard.writeText(finalText).then(() => {
+        alert("Đoạn văn bản đã được sao chép vào bộ nhớ tạm.");
+    }).catch(err => {
+        console.error("Không thể sao chép vào bộ nhớ tạm:", err);
+    });
+});
+

@@ -1,7 +1,7 @@
 body {
   font-family: Arial, sans-serif;
   padding: 0 20px 0px 20px;
-  text-align: left;  
+  text-align: left;
 }
 
 .header {
@@ -387,3 +387,67 @@ body {
   transform: translateY(1px);
 }
 
+.size-container {
+  display: none; /* Ẩn mặc định */
+  text-align: center;
+  position: fixed; /* Đặt vị trí cố định */
+  top: 50%; /* Đặt vị trí từ trên xuống */
+  left: 50%; /* Đặt vị trí từ bên trái */
+  transform: translate(-50%, -50%) scale(0.5); /* Căn giữa và thu nhỏ */
+  background-color: #ffffff; /* Nền trắng không trong suốt */
+  padding: 20px; /* Khoảng cách bên trong */
+  border-radius: 8px; /* Bo góc */
+  z-index: 1000; /* Đặt lớp phủ trên các phần tử khác */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng cho hiệu ứng nổi */
+  opacity: 0; /* Ẩn hoàn toàn */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Hiệu ứng chuyển đổi */
+  font-size: 18px;
+}
+
+/* Khi phần tử được hiển thị */
+.size-container.show {
+  display: block; /* Hiển thị */
+  opacity: 1; /* Hiện lên */
+  transform: translate(-50%, -50%) scale(1); /* Trở lại kích thước ban đầu */
+}
+
+.size-product {
+  display: flex; /* Sử dụng flexbox để sắp xếp theo hàng */
+  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+  flex-wrap: wrap; /* Cho phép các phần tử xuống hàng nếu không vừa */
+}
+
+.size-product input[type="checkbox"] {
+  margin: 0 10px; /* Khoảng cách giữa các ô checkbox */
+}
+
+.size-product label {
+  margin: 0 5px; /* Khoảng cách giữa nhãn và ô checkbox */
+}
+
+.btn-confirm, .cancel-size{
+  /* Màu chữ trắng */
+  background-color: #4CAF50; /* Màu nền xanh lá cây */
+  color: white; 
+  border: none; /* Không viền */
+  border-radius: 5px; /* Bo góc */
+  padding: 10px 20px; /* Khoảng cách bên trong */
+  text-align: center; /* Căn giữa chữ */
+  text-decoration: none; /* Không gạch chân */
+  display: inline-block; /* Hiển thị dạng khối nội tuyến */
+  font-size: 16px; /* Kích thước chữ */
+  margin: 10px 0; /* Khoảng cách xung quanh nút */
+  cursor: pointer; /* Con trỏ khi di chuột */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu */
+}
+.cancel-size{
+  background-color: #e94302; /* Màu nền xanh lá cây */
+  color: white; 
+}
+.btn-confirm:hover {
+  background-color: #45a049; /* Màu nền khi di chuột */
+}
+
+.cancel-size:hover{
+  background-color: #d63e02; 
+}
