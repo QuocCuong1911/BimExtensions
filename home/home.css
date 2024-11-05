@@ -388,6 +388,7 @@ body {
 }
 
 .size-container {
+  width: 400px;
   display: none; /* Ẩn mặc định */
   text-align: center;
   position: fixed; /* Đặt vị trí cố định */
@@ -395,7 +396,7 @@ body {
   left: 50%; /* Đặt vị trí từ bên trái */
   transform: translate(-50%, -50%) scale(0.5); /* Căn giữa và thu nhỏ */
   background-color: #ffffff; /* Nền trắng không trong suốt */
-  padding: 20px; /* Khoảng cách bên trong */
+  padding: 10px; /* Khoảng cách bên trong */
   border-radius: 8px; /* Bo góc */
   z-index: 1000; /* Đặt lớp phủ trên các phần tử khác */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng cho hiệu ứng nổi */
