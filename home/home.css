@@ -134,16 +134,19 @@ body {
 }
 
 #ma-tim, #don-gia {
+  height: 40px;
   width: 120px;
 }
 
 #id-sanpham{
   width: 100px;
+  height: 40px;
   margin-right: 10px;
 }
 
 #ten-hien-thi {
   width: 330px;
+  height: 40px;
   margin: 0 10px 0 10px;
 }
 
@@ -165,6 +168,7 @@ body {
   /* Giữ cố định khi cuộn */
   bottom: 30px;
   /* Cách đáy 10px */
+  height: 160px;
   left: 0;
   right: 0;
 }
