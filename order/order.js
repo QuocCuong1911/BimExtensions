@@ -62,8 +62,8 @@ document.addEventListener("DOMContentLoaded", function () {
                         product.donGia.toString().includes(query);
                 });
 
-                // Hiển thị tối đa 7 sản phẩm
-                filteredProducts.slice(0, 7).forEach(product => {
+                // Hiển thị tối đa 10 sản phẩm
+                filteredProducts.slice(0, 10).forEach(product => {
                     const suggestionItem = document.createElement("div");
                     suggestionItem.className = "suggestion-item";
                     suggestionItem.innerText = product.tenHienThi;
