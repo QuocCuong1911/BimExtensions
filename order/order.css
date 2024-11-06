@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 body {
     font-family: Arial, sans-serif !important;
     padding: 0 20px 0px 20px;
@@ -15,7 +16,6 @@ body {
 
 .home-icon {
     position: absolute;
-    left: 20px; /* Đặt icon ở bên trái */
     display: inline-flex;
     align-items: center;
     cursor: pointer;
@@ -28,6 +28,11 @@ body {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     border: 1px black solid;
 }
+
+.home-icon{
+    left: 20px; /* Đặt icon ở bên trái */
+}
+
 
 .home-icon:hover {
     width: 120px;
@@ -48,6 +53,45 @@ body {
 }
 
 .home-icon:hover .text {
+    opacity: 1;
+}
+
+.reset-icon {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    width: 40px;
+    transition: width 0.3s ease;
+    padding: 5px;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px black solid;
+    right: 20px; /* Đặt icon ở bên phải */
+}
+
+.reset-icon:hover {
+    width: 110px; /* Mở rộng sang trái khi hover */
+}
+
+.reset-icon .icon {
+    font-size: 20px;
+    color: #333;
+    margin-left: auto; /* Đẩy icon sang phải trong khi text mở rộng */
+}
+
+.reset-icon .text {
+    margin-right: 5px; /* Để chữ nằm bên trái icon */
+    font-size: 16px;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.reset-icon:hover .text {
     opacity: 1;
 }
 
@@ -454,3 +498,143 @@ body {
     border-top: 1px solid black; /* Thanh ngang */
     margin: 5px 0; /* Khoảng cách trên và dưới */
 }
+
+/* notifications */
+:root {
+    --dark: #34495E;
+    --light: #ffffff;
+    --success: #0ABF30;
+    --error: #E24D4C;
+    --warning: #E9BD0C;
+    --info: #3498DB;
+  }
+  .notifications {
+    position: fixed;
+    top: 30px;
+    right: 20px;
+  }
+  .notifications :where(.toastnew, .column) {
+    display: flex;
+    align-items: center;
+  }
+  .notifications .toastnew {
+    width: 400px;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    border-radius: 4px;
+    padding: 16px 17px;
+    margin-bottom: 10px;
+    background: var(--light);
+    justify-content: space-between;
+    animation: show_toastnew 0.3s ease forwards;
+  }
+  @keyframes show_toastnew {
+    0% {
+      transform: translateX(100%);
+    }
+    40% {
+      transform: translateX(-5%);
+    }
+    80% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-10px);
+    }
+  }
+  .notifications .toastnew.hide {
+    animation: hide_toastnew 0.3s ease forwards;
+  }
+  @keyframes hide_toastnew {
+    0% {
+      transform: translateX(-10px);
+    }
+    40% {
+      transform: translateX(0%);
+    }
+    80% {
+      transform: translateX(-5%);
+    }
+    100% {
+      transform: translateX(calc(100% + 20px));
+    }
+  }
+  .toastnew::before {
+    position: absolute;
+    content: "";
+    height: 3px;
+    width: 100%;
+    bottom: 0px;
+    left: 0px;
+    animation: progress 5s linear forwards;
+  }
+  @keyframes progress {
+    100% {
+      width: 0%;
+    }
+  }
+  .toastnew.success::before, .btn#success {
+    background: var(--success);
+  }
+  .toastnew.error::before, .btn#error {
+    background: var(--error);
+  }
+  .toastnew.warning::before, .btn#warning {
+    background: var(--warning);
+  }
+  .toastnew.info::before, .btn#info {
+    background: var(--info);
+  }
+  .toastnew .column i {
+    font-size: 1.75rem;
+  }
+  .toastnew.success .column i {
+    color: var(--success);
+  }
+  .toastnew.error .column i {
+    color: var(--error);
+  }
+  .toastnew.warning .column i {
+    color: var(--warning);
+  }
+  .toastnew.info .column i {
+    color: var(--info);
+  }
+  .toastnew .column span {
+    font-size: 1.07rem;
+    margin-left: 12px;
+  }
+  .toastnew i:last-child {
+    color: #aeb0d7;
+    cursor: pointer;
+  }
+  .toastnew i:last-child:hover {
+    color: var(--dark);
+  }
+  .buttons .btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    margin: 0 5px;
+    color: var(--light);
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+  
+  @media screen and (max-width: 530px) {
+    .notifications {
+      width: 95%;
+    }
+    .notifications .toastnew {
+      width: 100%;
+      font-size: 1rem;
+      margin-left: 20px;
+    }
+    .buttons .btn {
+      margin: 0 1px;
+      font-size: 1.1rem;
+      padding: 8px 15px;
+    }
+  }
