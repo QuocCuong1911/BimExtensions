@@ -290,10 +290,15 @@ function downloadExcelFile() {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Danh sách sản phẩm");
 
-        // Xuất file Excel
-        XLSX.writeFile(workbook, "Danh_sach_san_pham.xlsx");
+        // Lấy ngày và giờ hiện tại
+        const now = new Date();
+        const formattedDate = `${now.getHours()}h_${now.getMinutes()}m_${now.getDate()}d_${now.getMonth() + 1}m_${now.getFullYear()}y`;
+        
+        // Xuất file Excel với tên file có chứa ngày và giờ
+        XLSX.writeFile(workbook, `Danh_sach_san_pham_${formattedDate}.xlsx`);
     });
 }
+
 
 // Lắng nghe sự kiện nhập vào thanh tìm kiếm
 document.querySelector('input[name="search"]').addEventListener('input', function (event) {
