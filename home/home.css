@@ -392,7 +392,7 @@ body {
 }
 
 .size-container {
-  width: 400px;
+  width: 300px;
   display: none; /* Ẩn mặc định */
   text-align: center;
   position: fixed; /* Đặt vị trí cố định */
@@ -409,6 +409,9 @@ body {
   font-size: 18px;
 }
 
+.size-container h2{
+  margin: 0;
+}
 /* Khi phần tử được hiển thị */
 .size-container.show {
   display: block; /* Hiển thị */
@@ -420,6 +423,8 @@ body {
   display: flex; /* Sử dụng flexbox để sắp xếp theo hàng */
   justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
   flex-wrap: wrap; /* Cho phép các phần tử xuống hàng nếu không vừa */
+  row-gap: 10px;
+  margin: 20px 0 10px 0;
 }
 
 .size-product input[type="checkbox"] {
