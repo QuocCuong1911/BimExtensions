@@ -391,14 +391,19 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         const quantity = parseInt(product.querySelector('.quantity').value) || 1;
 
         const productTotal = price * quantity;
-        totalAmount += productTotal;
+        totalAmount += productTotal; // Cộng giá trị sản phẩm vào tổng tiền chỉ một lần
 
-        if (quantity > 1) {
-            productText += `${name} ${price} ${quantity} cái\n`;
-            totalExpression += `${price}+`.repeat(quantity);
+        if (price > 0) {
+            if (quantity > 1) {
+                productText += `${name} ${price} ${quantity} cái\n`;
+                totalExpression += `${price}+`.repeat(quantity);
+            } else {
+                productText += `${name} ${price}\n`;
+                totalExpression += `${price}+`;
+            }
         } else {
-            productText += `${name} ${price}\n`;
-            totalExpression += `${price}+`;
+            // Nếu giá bằng 0 thì chỉ thêm tên sản phẩm vào mà không có giá
+            productText += `${name}\n`;
         }
     });
 
@@ -425,6 +430,7 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         console.error("Không thể sao chép vào bộ nhớ tạm:", err);
     });
 });
+
 
 
 //Lên đơn
