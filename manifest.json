@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Bim Products Extensions",
+  "version": "1.1",
+  "description": "Hỗ trợ lên đơn hàng nhanh hơn",
+  "permissions": [
+    "storage",
+    "system.display",
+    "activeTab"
+  ],
+  "icons": {
+    "16": "icon/bimlogo16.png",
+    "32": "icon/bimlogo32.png",
+    "48": "icon/bimlogo48.png",
+    "128": "icon/bimlogo128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "scripts/content.js"
+      ]
+    }
+  ],
+  "commands": {
+    "open_order_window": {
+      "suggested_key": {
+        "default": "Ctrl+B"
+      },
+      "description": "Mở cửa sổ order"
+    }
+  },
+  "action": {
+    "default_title": "Open Product Manager"
+  }
+}

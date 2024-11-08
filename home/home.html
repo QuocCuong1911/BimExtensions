@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <input type="hidden" id="pageOpenCount" value="0">
+    <div class="header">
+        <div class="home-icon">
+            <span class="icon"><i class="fa-solid fa-cart-shopping"></i></span>
+            <span class="text">Lên đơn</span>
+        </div>
+        <h1>Danh sách sản phẩm</h1>
+    </div>
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table id="customers">
+                <colgroup>
+                    <col style="width: 10%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60%;">
+                    <col style="width: 10%;">
+                    <col style="width: 5%;">
+                </colgroup>
+                <tr>
+                    <th>ID</th>
+                    <th>Mã Tìm</th>
+                    <th>Sản Phẩm</th>
+                    <th>Giá</th>
+                    <th>Xóa</th>
+                </tr>
+    
+            </table>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <form action="" class="search-bar">
+            <input type="search" name="search" pattern=".*\S.*" required placeholder="Tìm kiếm sản phẩm...">
+            <button class="search-btn" type="submit">
+                <span>Tìm kiếm</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="crud-container">
+
+        <div class="input-container">
+            <div class="input-field">
+                <label for="id-sanpham">ID
+                    <span class="hint">TỰ ĐỘNG</span>
+                </label>
+                <input type="text" id="id-sanpham" placeholder="ID" disabled>
+            </div>
+            <div class="input-field">
+                <label for="ma-tim">Mã tìm
+                    <span class="hint">VD: C122</span>
+                </label>
+                <input type="text" id="ma-tim" placeholder="Mã tìm">
+            </div>
+            <div class="input-field">
+                <label for="ten-hien-thi">Tên hiển thị
+                    <span class="hint">VD: Áo trắng trơn cổ trụ</span>
+                </label>
+                <input type="text" id="ten-hien-thi" placeholder="Tên hiển thị">
+            </div>
+            <div class="input-field">
+                <label for="don-gia">Đơn giá
+                    <span class="hint">VD: 280</span>
+                </label>
+                <input type="text" id="don-gia" placeholder="Đơn giá">
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <!-- HTML !-->
+            <button class="button-them" role="button">Thêm</button>
+            <button class="button-sua" role="button">Sửa</button>
+            <button class="button-nhapex" role="button">Nhập Excel</button>
+            <input type="file" id="file-input" accept=".xlsx" style="display: none;" />
+            <button class="button-taiex" role="button">Tải Excel</button>
+            <button class="button-xoatoanbo" role="button">Xóa Toàn bộ</button>
+        </div>
+
+        <div class="size-container">
+            <h2>Chọn size của </h2> <h2>sản phẩm</h2>
+            <div class="size-product">
+                <input type="checkbox" id="FR" name="size" value="FR">
+                <label for="vehicle1">FR </label><br>
+                <input type="checkbox" id="S" name="size" value="S">
+                <label for="vehicle1">S </label><br>
+                <input type="checkbox" id="M" name="size" value="M">
+                <label for="vehicle1">M </label><br>
+                <input type="checkbox" id="L" name="size" value="L">
+                <label for="vehicle1">L </label><br>
+                <input type="checkbox" id="XL" name="size" value="XL">
+                <label for="vehicle1">XL </label><br>
+                <input type="checkbox" id="2XL" name="size" value="2XL">
+                <label for="vehicle1">2XL </label><br>
+                <input type="checkbox" id="3XL" name="size" value="3XL">
+                <label for="vehicle1">3XL </label><br>
+                <input type="checkbox" id="4XL" name="size" value="4XL">
+                <label for="vehicle1">4XL </label><br>
+            </div>
+            <button class="btn-confirm" id="confirm-size">Xác nhận</button>
+            <button class="cancel-size" id="cancel-size">Hủy</button>
+        </div>
+    </div>
+    <script src="home.js"></script>
+    <script src="/libary/xlsx.full.min.js"></script>
+
+</body>
+
+</html>

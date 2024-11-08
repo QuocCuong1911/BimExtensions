@@ -1,0 +1,463 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 0 20px 0px 20px;
+  text-align: left;
+}
+
+.header {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Căn giữa nội dung */
+  padding: 10px 20px;
+  position: relative;
+}
+
+.home-icon {
+  position: absolute;
+  left: 20px; /* Đặt icon ở bên trái */
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  width: 30px;
+  transition: width 0.3s ease;
+  padding: 10px;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border: 1px black solid;
+}
+
+.home-icon:hover {
+  width: 110px;
+}
+
+.icon {
+  font-size: 20px;
+  color: #333;
+}
+
+.text {
+  margin-left: 5px;
+  font-size: 16px;
+  color: #333;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.home-icon:hover .text {
+  opacity: 1;
+}
+
+/* Thiết kế h1 để trông chuyên nghiệp hơn */
+.header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif; /* Font chữ chuyên nghiệp */
+  letter-spacing: 1px; /* Giãn chữ */
+  text-transform: uppercase;
+}
+.table-container{
+  min-height: 500px;
+  margin: 10px 0;
+}
+.table-wrapper {
+  max-height: 500px; /* Chiều cao tối đa cho table wrapper */
+  overflow-y: auto;  /* Thêm thanh cuộn theo chiều dọc */
+  border: 1px solid #ccc; /* Viền cho wrapper */
+}
+
+#customers {
+  width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng */
+  border-collapse: collapse; /* Gộp các đường viền */
+}
+
+#customers th, #customers td {
+  border: 1px solid #ddd; /* Viền cho th và td */
+  padding: 8px; /* Khoảng cách bên trong */ 
+  font-size: 16px;
+}
+
+#customers th {
+  background-color: #f2f2f2; /* Màu nền cho tiêu đề */
+  position: sticky; /* Giữ cố định tiêu đề khi cuộn */
+  top: 0; /* Đặt vị trí ở trên cùng của bảng */
+  z-index: 1; /* Đảm bảo tiêu đề luôn nằm trên các ô khác */
+}
+
+
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#customers tr:hover {
+  background-color: #ddd;
+}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: center;
+  background-color: #04AA6D;
+  color: white;
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.hint {
+  font-size: 0.7em; /* Kích thước chữ nhỏ hơn */
+  color: #888; /* Màu xám nhạt */
+  margin-left: 1px; /* Khoảng cách giữa label và chú thích */
+}
+
+#ma-tim, #don-gia {
+  height: 40px;
+  width: 120px;
+}
+
+#id-sanpham{
+  width: 100px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+#ten-hien-thi {
+  width: 330px;
+  height: 40px;
+  margin: 0 10px 0 10px;
+}
+
+.input-field label {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.input-field input[type="text"] {
+  padding: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.crud-container {
+  margin: 0px 20px 0 20px;
+  position: fixed;
+  /* Giữ cố định khi cuộn */
+  bottom: 20px;
+  /* Cách đáy 10px */
+  height: 160px;
+  left: 0;
+  right: 0;
+}
+
+.btn-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  /* khoảng cách giữa các nút */
+}
+
+.button-them,
+.button-sua,
+.button-nhapex,
+.button-taiex,
+.button-xoatoanbo {
+  align-items: center;
+  background-color: #5cecfa;
+  border: 2px solid #111;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  height: 35px;
+  justify-content: center;
+  line-height: 24px;
+  max-width: 100%;
+  padding: 0 15px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-them:after,
+.button-sua:after,
+.button-nhapex:after,
+.button-taiex:after,
+.button-xoatoanbo:after {
+  background-color: #848587;
+  border-radius: 8px;
+  content: "";
+  display: block;
+  height: 32px;
+  left: 0;
+  width: 100%;
+  position: absolute;
+  top: -1px;
+  transform: translate(8px, 8px);
+  transition: transform .2s ease-out;
+  z-index: -1;
+}
+
+/* Hover effect for all buttons */
+.button-them:hover:after,
+.button-sua:hover:after,
+.button-nhapex:hover:after,
+.button-taiex:hover:after,
+.button-xoatoanbo:hover:after {
+  transform: translate(0, 0);
+}
+
+/* Active state for all buttons */
+.button-them:active,
+.button-sua:active,
+.button-nhapex:active,
+.button-taiex:active,
+.button-xoatoanbo:active
+ {
+  background-color: #ffdeda;
+  outline: 0;
+}
+.button-xoatoanbo:hover{
+  background-color: #ff0808;
+  color: white;
+  outline: 0;
+}
+/* Hover outline removal for all buttons */
+.button-them:hover,
+.button-sua:hover,
+.button-nhapex:hover,
+.button-taiex:hover {
+  background-color: #61f14b;
+  color: white;
+  outline: 0;
+}
+
+/* Responsive padding for all buttons */
+@media (min-width: 768px) {
+
+  .button-them,
+  .button-sua,
+  .button-nhapex,
+  .button-taiex,
+  .button-xoatoanbo{
+    padding: 0 30px;
+  }
+}
+
+.search-container, .search-bar {
+  display: flex;
+}
+
+.search-bar input,
+.search-btn, 
+.search-btn:before, 
+.search-btn:after {
+  transition: all 0.25s ease-out;
+}
+.search-bar input,
+.search-btn {
+  width: 3em;
+  height: 3em;
+}
+.search-bar input:invalid:not(:focus),
+.search-btn { 
+  cursor: pointer;
+}
+.search-bar,
+.search-bar input:focus,
+.search-bar input:valid  {
+  width: 100%;
+}
+.search-bar input:focus,
+.search-bar input:not(:focus) + .search-btn:focus {
+  outline: transparent;
+}
+.search-bar {
+  margin: auto;
+  justify-content: center;
+  max-width: 500px;
+}
+.search-bar input {
+  background: transparent;
+  border-radius: 1.5em;
+  box-shadow: 0 0 0 0.4em #171717 inset;
+  padding: 0.75em;
+  transform: translate(0.5em,0.5em) scale(0.5);
+  transform-origin: 100% 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+.search-bar input::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+.search-bar input:focus,
+.search-bar input:valid {
+  background: #fff;
+  border-radius: 0.375em 0 0 0.375em;
+  box-shadow: 0 0 0 0.1em #d9d9d9 inset;
+  transform: scale(1);
+}
+.search-btn {
+  background: #171717;
+  border-radius: 0 0.75em 0.75em 0 / 0 1.5em 1.5em 0;
+  padding: 0.75em;
+  position: relative;
+  transform: translate(0.25em,0.25em) rotate(45deg) scale(0.25,0.125);
+  transform-origin: 0 50%;
+}
+.search-btn:before, 
+.search-btn:after {
+  content: "";
+  display: block;
+  opacity: 0;
+  position: absolute;
+}
+.search-btn:before {
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.2em #f1f1f1 inset;
+  top: 0.75em;
+  left: 0.75em;
+  width: 1.2em;
+  height: 1.2em;
+}
+.search-btn:after {
+  background: #f1f1f1;
+  border-radius: 0 0.25em 0.25em 0;
+  top: 51%;
+  left: 51%;
+  width: 0.75em;
+  height: 0.25em;
+  transform: translate(0.2em,0) rotate(45deg);
+  transform-origin: 0 50%;
+}
+.search-btn span {
+  display: inline-block;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+}
+
+/* Active state */
+.search-bar input:focus + .search-btn,
+.search-bar input:valid + .search-btn {
+  background: #2762f3;
+  border-radius: 0 0.375em 0.375em 0;
+  transform: scale(1);
+}
+.search-bar input:focus + .search-btn:before, 
+.search-bar input:focus + .search-btn:after,
+.search-bar input:valid + .search-btn:before, 
+.search-bar input:valid + .search-btn:after {
+  opacity: 1;
+}
+.search-bar input:focus + .search-btn:hover,
+.search-bar input:valid + .search-btn:hover,
+.search-bar input:valid:not(:focus) + .search-btn:focus {
+  background: #0c48db;
+}
+.search-bar input:focus + .search-btn:active,
+.search-bar input:valid + .search-btn:active {
+  transform: translateY(1px);
+}
+
+.size-container {
+  width: 300px;
+  display: none; /* Ẩn mặc định */
+  text-align: center;
+  position: fixed; /* Đặt vị trí cố định */
+  top: 50%; /* Đặt vị trí từ trên xuống */
+  left: 50%; /* Đặt vị trí từ bên trái */
+  transform: translate(-50%, -50%) scale(0.5); /* Căn giữa và thu nhỏ */
+  background-color: #ffffff; /* Nền trắng không trong suốt */
+  padding: 10px; /* Khoảng cách bên trong */
+  border-radius: 8px; /* Bo góc */
+  z-index: 1000; /* Đặt lớp phủ trên các phần tử khác */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng cho hiệu ứng nổi */
+  opacity: 0; /* Ẩn hoàn toàn */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Hiệu ứng chuyển đổi */
+  font-size: 18px;
+}
+
+.size-container h2{
+  margin: 0;
+}
+/* Khi phần tử được hiển thị */
+.size-container.show {
+  display: block; /* Hiển thị */
+  opacity: 1; /* Hiện lên */
+  transform: translate(-50%, -50%) scale(1); /* Trở lại kích thước ban đầu */
+}
+
+.size-product {
+  display: flex; /* Sử dụng flexbox để sắp xếp theo hàng */
+  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+  flex-wrap: wrap; /* Cho phép các phần tử xuống hàng nếu không vừa */
+  row-gap: 10px;
+  margin: 20px 0 10px 0;
+}
+
+.size-product input[type="checkbox"] {
+  margin: 0 10px; /* Khoảng cách giữa các ô checkbox */
+}
+
+.size-product label {
+  margin: 0 5px; /* Khoảng cách giữa nhãn và ô checkbox */
+}
+
+.btn-confirm, .cancel-size{
+  /* Màu chữ trắng */
+  background-color: #4CAF50; /* Màu nền xanh lá cây */
+  color: white; 
+  border: none; /* Không viền */
+  border-radius: 5px; /* Bo góc */
+  padding: 10px 20px; /* Khoảng cách bên trong */
+  text-align: center; /* Căn giữa chữ */
+  text-decoration: none; /* Không gạch chân */
+  display: inline-block; /* Hiển thị dạng khối nội tuyến */
+  font-size: 16px; /* Kích thước chữ */
+  margin: 10px 0; /* Khoảng cách xung quanh nút */
+  cursor: pointer; /* Con trỏ khi di chuột */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu */
+}
+.cancel-size{
+  background-color: #e94302; /* Màu nền xanh lá cây */
+  color: white; 
+}
+.btn-confirm:hover {
+  background-color: #45a049; /* Màu nền khi di chuột */
+}
+
+.cancel-size:hover{
+  background-color: #d63e02; 
+}

@@ -1,0 +1,640 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+body {
+    font-family: Arial, sans-serif !important;
+    padding: 0 20px 0px 20px;
+    width: 680px;
+  }
+
+.header {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Căn giữa nội dung */
+    padding: 10px 20px;
+    position: relative;
+}
+
+.home-icon {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    width: 40px;
+    transition: width 0.3s ease;
+    padding: 5px;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px black solid;
+}
+
+.home-icon{
+    left: 20px; /* Đặt icon ở bên trái */
+}
+
+
+.home-icon:hover {
+    width: 120px;
+}
+
+.icon {
+    font-size: 20px;
+    color: #333;
+}
+
+.text {
+    margin-left: 5px;
+    font-size: 16px;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.home-icon:hover .text {
+    opacity: 1;
+}
+
+.reset-icon {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    width: 40px;
+    transition: width 0.3s ease;
+    padding: 5px;
+    border-radius: 20px;
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px black solid;
+    right: 20px; /* Đặt icon ở bên phải */
+}
+
+.reset-icon:hover {
+    width: 110px; /* Mở rộng sang trái khi hover */
+}
+
+.reset-icon .icon {
+    font-size: 20px;
+    color: #333;
+    margin-left: auto; /* Đẩy icon sang phải trong khi text mở rộng */
+}
+
+.reset-icon .text {
+    margin-right: 5px; /* Để chữ nằm bên trái icon */
+    font-size: 16px;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.reset-icon:hover .text {
+    opacity: 1;
+}
+
+/* Thiết kế h1 để trông chuyên nghiệp hơn */
+.header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* Font chữ chuyên nghiệp */
+    letter-spacing: 1px; /* Giãn chữ */
+    text-transform: uppercase;
+}
+.order-container {
+    position: relative !important;  /* Để nút con có thể định vị tuyệt đối bên trong */
+    max-height: 450px;
+    overflow-y: auto;
+    width: 650px;
+    height: 450px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.title-table{
+    margin-top: 5px;
+    display: flex;
+    align-items: center;  /* Căn giữa theo chiều dọc */
+}
+.name-title, .price-title, .quantity-title{
+    font-size: 20px;
+    font-weight: bolder;
+}
+.name-title{
+    margin-left: 100px;
+}
+
+.price-title{
+    margin-left: 150px;
+}
+
+.quantity-title{
+    margin-left: 60px;
+}
+
+.list-products{
+    list-style: none;
+    padding-left: 20px;
+}
+
+.product-order{
+    margin: 10px 0 10px 0;
+}
+.product-name{
+    font-family: Arial, sans-serif !important;
+    font-size: 16px;
+    display: inline-block;
+    text-align: left;
+    border: 1px solid blue; /* Tạo viền dày 1px, màu xanh */
+    padding: 11px;           /* Khoảng cách giữa viền và nội dung */
+    border-top-left-radius: 45px; /* Bo tròn góc trên bên trái */
+    border-bottom-left-radius: 45px; /* Bo tròn góc dưới bên trái */     /* Tùy chọn bo góc viền */
+    width: 330px;
+
+}
+
+.price-product{
+    -moz-appearance: textfield; /* Firefox */
+    -webkit-appearance: none; /* Safari và Chrome */
+    appearance: none; /* Chuẩn chung */
+    width: 130px;
+    padding: 11px;
+    border: 1px solid blue;
+    font-size: 15px;
+}
+
+.quantity{
+    width: 70px;
+    padding: 11px;
+    border: 1px solid blue;
+    font-size: 15px;
+}
+
+.price-product::-webkit-outer-spin-button,
+.price-product::-webkit-inner-spin-button {
+    -webkit-appearance: none; /* Ẩn các nút tăng giảm trong Chrome và Safari */
+    margin: 0;
+}
+
+.delete-product {
+    background-color: #ff4d4d; /* Màu nền */
+    color: white; /* Màu biểu tượng */
+    border: none;
+    border-radius: 0 45px 45px 0; /* Bo tròn 2 góc bên phải */
+    padding: 12px;
+    width: 50px;
+    cursor: pointer;
+
+    transition: background-color 0.3s; /* Hiệu ứng mượt khi hover */
+}
+
+.delete-product:hover {
+    background-color: #e60000; /* Thay đổi màu khi hover */
+}
+
+.fa-trash{
+    font-size: 17px;
+}
+
+
+.second-container {
+    display: flex;
+    align-items: center;  /* Căn giữa theo chiều dọc */
+    gap: 20px;            /* Khoảng cách giữa các phần tử */
+    font-family: Arial, sans-serif !important;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.total-box {
+    display: flex;
+    align-items: center;   /* Căn giữa các total-item theo chiều dọc */
+    gap: 20px;             /* Khoảng cách giữa các total-item */
+    width: 100%;
+    border: 2px solid rgb(34, 218, 5);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-item {
+    display: flex;
+    align-items: center;   /* Căn giữa nội dung trong total-item theo chiều dọc */
+    gap: 10px;             /* Khoảng cách giữa span và input */
+}
+
+.total-item span {
+    margin-bottom: 0;      /* Xóa khoảng cách phía dưới để span nằm ngang với input */
+}
+
+
+.total-item input {
+    width: 100%; /* Chiều rộng của input sẽ chiếm hết không gian có sẵn */
+    padding: 5px; /* Thêm khoảng cách bên trong cho ô input */
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng chiều rộng */
+}
+
+.voucher-box {
+    flex: 0; /* Chiếm ít không gian hơn so với .total-box */
+    display: flex;
+    width: 30%;
+    
+    align-items: center;
+    gap: 5px; /* Khoảng cách giữa các phần tử bên trong .voucher-box */
+    border: 2px solid blue;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.total-item input{
+    font-weight: bolder;
+    text-align: center;
+    color: #109a17;
+}
+.discount input,
+.voucher-box input {
+    width: 80px; /* Đặt chiều rộng cho các ô input */
+    font-size: 20px;
+    text-align: center;
+}
+
+.three-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between; /* Đặt khoảng cách đều giữa các phần tử */
+    align-items: center; /* Canh giữa theo chiều dọc */
+}
+
+.discount {
+    border: 2px solid rgb(0, 215, 235);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/*  */
+.shipping-fee {
+    display: flex;
+    align-items: center;  /* Căn giữa các phần tử theo chiều dọc */
+    gap: 10px;      
+    border: 2px solid rgb(219, 208, 2);
+    padding: 15px;
+    border-radius: 5px;      /* Khoảng cách giữa các phần tử */
+}
+
+.shipping-fee span {
+    margin-right: 10px;   /* Khoảng cách giữa span và các tùy chọn */
+}
+
+.shipping-options {
+    display: flex;
+    gap: 6px;             /* Khoảng cách giữa các tùy chọn */
+}
+
+.shipping-options label {
+    margin-left: 0px;     /* Khoảng cách giữa input và label */
+}
+
+
+/* CSS */
+.add-button{
+    align-items: center;
+    appearance: none;
+    background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+    border: 0;
+    border-radius: 6px;
+    box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+    box-sizing: border-box;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: "JetBrains Mono",monospace;
+    height: 48px;
+    width: 200px;
+    justify-content: center;
+    line-height: 1;
+    list-style: none;
+    overflow: hidden;
+    padding-left: 18px;
+    padding-right: 18px;
+    position: relative;
+    text-align: left;
+    text-decoration: none;
+    transition: box-shadow .15s,transform .15s;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    will-change: box-shadow,transform;
+    font-size: 18px;
+  }
+  
+.add-button:focus {
+    box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+  }
+  
+.add-button:hover {
+    box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+    transform: translateY(-2px);
+}
+  
+.add-button:active {
+    box-shadow: #3c4fe0 0 3px 7px inset;
+    transform: translateY(2px);
+}
+
+.four-container{
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between; /* Đặt khoảng cách đều giữa các phần tử */
+    align-items: center; 
+}
+  .search-bar-order {
+    position: relative;
+    width: 445px; /* Điều chỉnh độ rộng của thanh tìm kiếm theo nhu cầu */
+}
+
+.search-bar-order input {
+    width: 100%;
+    padding: 10px 40px; /* Thêm khoảng trống cho icon bên trái */
+    border: 2px solid black; /* Viền ngoài màu đen */
+    border-radius: 25px; /* Bo tròn hai đầu */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng nổi */
+    font-size: 16px;
+    outline: none;
+    background-color: #f9f9f9; /* Màu nền nhẹ */
+    transition: border 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.search-bar-order input:focus {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 2px solid black; /* Chỉ còn viền ở chân */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Tăng bóng khi focus */
+    transform: translateY(-2px); /* Hiệu ứng nổi lên khi focus */
+}
+
+.search-bar-order .search-icon {
+    position: absolute;
+    left: 15px; /* Đặt icon vào bên trái của input */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px; /* Kích thước của icon */
+    color: #666; /* Màu icon */
+    pointer-events: none; /* Không cho phép click vào icon */
+}
+
+/* CSS */
+.create-btn {
+    padding: 0.6em 2em;
+    border: none;
+    outline: none;
+    color: rgb(0, 0, 0);
+    font-size: large;
+    font-weight: bolder;
+    background: #9bfe87;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    transition: box-shadow .15s,transform .15s;
+  }
+  
+  .create-btn:before {
+    content: "";
+    background: linear-gradient(
+      45deg,
+      #ff0000,
+      #ff7300,
+      #fffb00,
+      #48ff00,
+      #00ffd5,
+      #002bff,
+      #7a00ff,
+      #ff00c8,
+      #ff0000
+    );
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing-button-85 20s linear infinite;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: 10px;
+  }
+  
+  @keyframes glowing-button-85 {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 400% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+  
+  .create-btn:after {
+    z-index: -1;
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #dfe1e2;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
+  }
+
+.create-btn:hover{
+    transform: translateY(-2px);
+}
+
+.create-btn:active{
+    transform: translateY(2px);
+}
+
+.search-bar-order {
+    position: relative; /* Để các phần tử con sử dụng vị trí tuyệt đối */
+}
+
+.suggestions {
+    position: absolute;
+    bottom: 100%; /* Đặt phần tử gợi ý ngay phía trên ô tìm kiếm */
+    left: 0; /* Căn trái với ô tìm kiếm */
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    width: calc(100% - 20px); /* Chiều rộng bằng với ô tìm kiếm */
+    max-height: 500px; /* Giới hạn chiều cao */
+    overflow-y: auto; /* Cuộn khi cần thiết */
+    display: none; /* Bắt đầu ẩn */
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0; /* Nền đổi màu khi hover */
+}
+
+.separator {
+    border-top: 1px solid black; /* Thanh ngang */
+    margin: 5px 0; /* Khoảng cách trên và dưới */
+}
+
+/* notifications */
+:root {
+    --dark: #34495E;
+    --light: #ffffff;
+    --success: #0ABF30;
+    --error: #E24D4C;
+    --warning: #E9BD0C;
+    --info: #3498DB;
+  }
+  .notifications {
+    position: fixed;
+    top: 30px;
+    right: 20px;
+  }
+  .notifications :where(.toastnew, .column) {
+    display: flex;
+    align-items: center;
+  }
+  .notifications .toastnew {
+    width: 400px;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    border-radius: 4px;
+    padding: 16px 17px;
+    margin-bottom: 10px;
+    background: var(--light);
+    justify-content: space-between;
+    animation: show_toastnew 0.3s ease forwards;
+  }
+  @keyframes show_toastnew {
+    0% {
+      transform: translateX(100%);
+    }
+    40% {
+      transform: translateX(-5%);
+    }
+    80% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-10px);
+    }
+  }
+  .notifications .toastnew.hide {
+    animation: hide_toastnew 0.3s ease forwards;
+  }
+  @keyframes hide_toastnew {
+    0% {
+      transform: translateX(-10px);
+    }
+    40% {
+      transform: translateX(0%);
+    }
+    80% {
+      transform: translateX(-5%);
+    }
+    100% {
+      transform: translateX(calc(100% + 20px));
+    }
+  }
+  .toastnew::before {
+    position: absolute;
+    content: "";
+    height: 3px;
+    width: 100%;
+    bottom: 0px;
+    left: 0px;
+    animation: progress 5s linear forwards;
+  }
+  @keyframes progress {
+    100% {
+      width: 0%;
+    }
+  }
+  .toastnew.success::before, .btn#success {
+    background: var(--success);
+  }
+  .toastnew.error::before, .btn#error {
+    background: var(--error);
+  }
+  .toastnew.warning::before, .btn#warning {
+    background: var(--warning);
+  }
+  .toastnew.info::before, .btn#info {
+    background: var(--info);
+  }
+  .toastnew .column i {
+    font-size: 1.75rem;
+  }
+  .toastnew.success .column i {
+    color: var(--success);
+  }
+  .toastnew.error .column i {
+    color: var(--error);
+  }
+  .toastnew.warning .column i {
+    color: var(--warning);
+  }
+  .toastnew.info .column i {
+    color: var(--info);
+  }
+  .toastnew .column span {
+    font-size: 1.07rem;
+    margin-left: 12px;
+  }
+  .toastnew i:last-child {
+    color: #aeb0d7;
+    cursor: pointer;
+  }
+  .toastnew i:last-child:hover {
+    color: var(--dark);
+  }
+  .buttons .btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    margin: 0 5px;
+    color: var(--light);
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 4px;
+  }
+  
+  @media screen and (max-width: 530px) {
+    .notifications {
+      width: 95%;
+    }
+    .notifications .toastnew {
+      width: 100%;
+      font-size: 1rem;
+      margin-left: 20px;
+    }
+    .buttons .btn {
+      margin: 0 1px;
+      font-size: 1.1rem;
+      padding: 8px 15px;
+    }
+  }
