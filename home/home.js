@@ -2,6 +2,32 @@
 let currentEditProduct = null;
 let currentId = 1; // Khởi tạo ID bắt đầu từ 1
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Thực hiện hành động khi HTML được tải xong
+    console.log("Nội dung HTML đã được tải xong!");
+    // Tăng số lần trang mở
+    incrementPageOpenCount();
+});
+
+function incrementPageOpenCount() {
+    // Lấy thẻ input ẩn để ghi nhận số lần mở trang
+    const pageOpenCountInput = document.getElementById('pageOpenCount');
+
+    // Lấy giá trị hiện tại từ localStorage (nếu có), hoặc bắt đầu từ 0
+    let count = parseInt(localStorage.getItem('pageOpenCount')) || 0;
+
+    // Tăng giá trị lên 1 mỗi khi trang được mở
+    count++;
+
+    // Lưu giá trị vào thẻ input ẩn
+    pageOpenCountInput.value = count;
+
+    // Lưu lại giá trị mới vào localStorage
+    localStorage.setItem('pageOpenCount', count);
+
+    console.log("Số lần mở : " + count);
+}
+
 document.querySelector('.home-icon').addEventListener('click', function() {
     const homeWidth = 700;  // Độ rộng cho home
     const homeHeight = 800;  // Độ cao cho home
