@@ -324,6 +324,67 @@ const removetoastnew = (toast) => {
 };
 
 // Thêm sự kiện vào nút "Lên Đơn"
+// document.querySelector('.create-btn').addEventListener('click', function () {
+//     const products = document.querySelectorAll('.product-order');
+//     if (products.length === 0) {
+//         showtoastnew("Không có sản phẩm nào để lên đơn!", "error"); // Sử dụng toastnew cho thông báo lỗi
+//         return;
+//     }
+
+//     let productText = "";
+//     let totalExpression = "";
+//     let totalAmount = 0;
+//     const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
+//     const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
+//     const discount = parseFloat(document.getElementById("discount-item").value) || 0;
+
+//     products.forEach((product) => {
+//         const name = product.querySelector('.product-name').value;
+//         const priceString = product.querySelector('.price-product').value;
+//         const price = parseFloat(priceString) || 0;
+//         const quantity = parseInt(product.querySelector('.quantity').value) || 1;
+
+//         const productTotal = price * quantity;
+//         totalAmount += productTotal; // Cộng giá trị sản phẩm vào tổng tiền chỉ một lần
+
+//         if (price > 0) {
+//             if (quantity > 1) {
+//                 productText += `${name} ${price} ${quantity} cái\n`;
+//                 totalExpression += `${price}+`.repeat(quantity);
+//             } else {
+//                 productText += `${name} ${price}\n`;
+//                 totalExpression += `${price}+`;
+//             }
+//         } else {
+//             // Nếu giá bằng 0 thì chỉ thêm tên sản phẩm vào mà không có giá
+//             productText += `${name}\n`;
+//         }
+//     });
+
+//     totalExpression = totalExpression.slice(0, -1); // Loại bỏ dấu "+" cuối cùng
+//     totalExpression += `+${shipFee}ship`;
+//     if (voucher > 0) totalExpression += `-${voucher}(voucher)`;
+//     if (discount > 0) totalExpression += `-${discount}( )`;
+
+//     let finalTotal = totalAmount + shipFee - voucher - discount;
+
+//     let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
+//     finalText += `TC : ${totalExpression} = ${finalTotal}K`;
+
+//     if (shipFee === 0) {
+//         finalText += " (miễn ship)";
+//     }
+
+//     finalText += " ạ";
+
+//     navigator.clipboard.writeText(finalText).then(() => {
+//         showtoastnew("Đoạn văn bản đã được sao chép vào bộ nhớ tạm.", "success");
+//     }).catch(err => {
+//         showtoastnew("Không thể sao chép vào bộ nhớ tạm.", "error");
+//         console.error("Không thể sao chép vào bộ nhớ tạm:", err);
+//     });
+// });
+
 document.querySelector('.create-btn').addEventListener('click', function () {
     const products = document.querySelectorAll('.product-order');
     if (products.length === 0) {
@@ -362,14 +423,31 @@ document.querySelector('.create-btn').addEventListener('click', function () {
     });
 
     totalExpression = totalExpression.slice(0, -1); // Loại bỏ dấu "+" cuối cùng
-    totalExpression += `+${shipFee}ship`;
+
+    // Chỉ thêm phí ship nếu shipFee > 0
+    if (shipFee > 0) {
+        totalExpression += `+${shipFee}ship`;
+    }
+
     if (voucher > 0) totalExpression += `-${voucher}(voucher)`;
     if (discount > 0) totalExpression += `-${discount}( )`;
 
     let finalTotal = totalAmount + shipFee - voucher - discount;
 
+    // Kiểm tra nếu chỉ có một sản phẩm và không có phí ship, giảm giá, voucher
+    if (products.length === 1 && shipFee === 0 && voucher === 0 && discount === 0) {
+        totalExpression = `${totalAmount}`; // Chỉ hiển thị giá sản phẩm
+        finalTotal = totalAmount; // Đảm bảo tổng tiền cuối cùng chỉ là giá trị sản phẩm
+    }
+
     let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
-    finalText += `TC : ${totalExpression} = ${finalTotal}K`;
+
+    // Xử lý hiển thị tổng cộng
+    if (products.length === 1 && shipFee === 0 && voucher === 0 && discount === 0) {
+        finalText += `TC : ${totalAmount}K`;
+    } else {
+        finalText += `TC : ${totalExpression} = ${finalTotal}K`;
+    }
 
     if (shipFee === 0) {
         finalText += " (miễn ship)";
@@ -384,5 +462,7 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         console.error("Không thể sao chép vào bộ nhớ tạm:", err);
     });
 });
+
+
 
 // Thêm sự kiện vào nút "Lên Đơn"
