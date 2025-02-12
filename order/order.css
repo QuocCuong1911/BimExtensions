@@ -355,7 +355,8 @@ body {
 }
   .search-bar-order {
     position: relative;
-    width: 445px; /* Điều chỉnh độ rộng của thanh tìm kiếm theo nhu cầu */
+    width: 420px; /* Điều chỉnh độ rộng của thanh tìm kiếm theo nhu cầu */
+    margin-right: 20px;
 }
 
 .search-bar-order input {
@@ -389,6 +390,23 @@ body {
     pointer-events: none; /* Không cho phép click vào icon */
 }
 
+.customer-sdt{
+  position: relative;
+  margin-right: 20px;
+  width: 180px; 
+}
+
+.customer-sdt input{
+  width: 100%;
+    padding: 10px; /* Thêm khoảng trống cho icon bên trái */
+    border: 2px solid black; /* Viền ngoài màu đen */
+    border-radius: 25px; /* Bo tròn hai đầu */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Hiệu ứng nổi */
+    font-size: 16px;
+    outline: none;
+    background-color: #f9f9f9; /* Màu nền nhẹ */
+    transition: border 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
 /* CSS */
 .create-btn {
     padding: 0.6em 2em;

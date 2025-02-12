@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+    cleanOldOrders();
+
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
         searchInput.focus();
@@ -323,67 +325,7 @@ const removetoastnew = (toast) => {
     setTimeout(() => toast.remove(), 500); // Xóa thông báo sau khi animation kết thúc
 };
 
-// Thêm sự kiện vào nút "Lên Đơn"
-// document.querySelector('.create-btn').addEventListener('click', function () {
-//     const products = document.querySelectorAll('.product-order');
-//     if (products.length === 0) {
-//         showtoastnew("Không có sản phẩm nào để lên đơn!", "error"); // Sử dụng toastnew cho thông báo lỗi
-//         return;
-//     }
 
-//     let productText = "";
-//     let totalExpression = "";
-//     let totalAmount = 0;
-//     const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
-//     const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
-//     const discount = parseFloat(document.getElementById("discount-item").value) || 0;
-
-//     products.forEach((product) => {
-//         const name = product.querySelector('.product-name').value;
-//         const priceString = product.querySelector('.price-product').value;
-//         const price = parseFloat(priceString) || 0;
-//         const quantity = parseInt(product.querySelector('.quantity').value) || 1;
-
-//         const productTotal = price * quantity;
-//         totalAmount += productTotal; // Cộng giá trị sản phẩm vào tổng tiền chỉ một lần
-
-//         if (price > 0) {
-//             if (quantity > 1) {
-//                 productText += `${name} ${price} ${quantity} cái\n`;
-//                 totalExpression += `${price}+`.repeat(quantity);
-//             } else {
-//                 productText += `${name} ${price}\n`;
-//                 totalExpression += `${price}+`;
-//             }
-//         } else {
-//             // Nếu giá bằng 0 thì chỉ thêm tên sản phẩm vào mà không có giá
-//             productText += `${name}\n`;
-//         }
-//     });
-
-//     totalExpression = totalExpression.slice(0, -1); // Loại bỏ dấu "+" cuối cùng
-//     totalExpression += `+${shipFee}ship`;
-//     if (voucher > 0) totalExpression += `-${voucher}(voucher)`;
-//     if (discount > 0) totalExpression += `-${discount}( )`;
-
-//     let finalTotal = totalAmount + shipFee - voucher - discount;
-
-//     let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
-//     finalText += `TC : ${totalExpression} = ${finalTotal}K`;
-
-//     if (shipFee === 0) {
-//         finalText += " (miễn ship)";
-//     }
-
-//     finalText += " ạ";
-
-//     navigator.clipboard.writeText(finalText).then(() => {
-//         showtoastnew("Đoạn văn bản đã được sao chép vào bộ nhớ tạm.", "success");
-//     }).catch(err => {
-//         showtoastnew("Không thể sao chép vào bộ nhớ tạm.", "error");
-//         console.error("Không thể sao chép vào bộ nhớ tạm:", err);
-//     });
-// });
 
 document.querySelector('.create-btn').addEventListener('click', function () {
     const products = document.querySelectorAll('.product-order');
@@ -461,8 +403,177 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         showtoastnew("Không thể sao chép vào bộ nhớ tạm.", "error");
         console.error("Không thể sao chép vào bộ nhớ tạm:", err);
     });
+
+    saveOrderToStorage(products);
+});
+
+function saveOrderToStorage(products) {
+    const sdtInput = document.getElementById("customer-sdt");
+    if (!sdtInput) {
+        console.error("Không tìm thấy ô nhập SDT!");
+        return;
+    }
+    const sdt = sdtInput.value.trim();
+
+    if (!sdt) {
+        console.log("Chưa nhập SDT, không lưu đơn hàng vào storage");
+        return;
+    }
+
+    // Lấy giá trị voucher, giảm giá và phí ship
+    const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
+    const discount = parseFloat(document.getElementById("discount-item").value) || 0;
+    const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
+
+    const newOrder = {
+        sdt: sdt,
+        products: Array.from(products).map(product => ({
+            name: product.querySelector('.product-name').value,
+            price: parseFloat(product.querySelector('.price-product').value) || 0,
+            quantity: parseInt(product.querySelector('.quantity').value) || 1
+        })),
+        voucher: voucher,
+        discount: discount,
+        shipFee: shipFee,
+        orderTime: new Date().toISOString()
+    };
+
+    chrome.storage.local.get("orderHistory", (data) => {
+        let orderHistory = data.orderHistory || [];
+
+        // Kiểm tra xem SDT đã tồn tại chưa
+        const existingOrderIndex = orderHistory.findIndex(order => order.sdt === sdt);
+
+        if (existingOrderIndex !== -1) {
+            // Nếu tồn tại, cập nhật đơn hàng
+            orderHistory[existingOrderIndex] = newOrder;
+        } else {
+            // Nếu chưa tồn tại, thêm mới
+            orderHistory.push(newOrder);
+        }
+
+        chrome.storage.local.set({ orderHistory: orderHistory }, () => {
+            console.log("Đơn hàng đã được lưu/cập nhật:", newOrder);
+        });
+    });
+}
+
+
+  
+// Lắng nghe sự kiện nhập ở ô SDT khách hàng (cho mục đích tra cứu đơn hàng đã lưu)
+document.getElementById("customer-sdt").addEventListener("input", function () {
+    const query = this.value.trim();
+    const suggestionsDiv = document.getElementById("sdt-suggestions");
+    suggestionsDiv.innerHTML = "";
+
+    if (!query) {
+        suggestionsDiv.style.display = "none";
+        return;
+    }
+
+    chrome.storage.local.get("orderHistory", (data) => {
+        const orderHistory = data.orderHistory || [];
+
+        // Lọc danh sách SDT trùng khớp với truy vấn nhập vào
+        const matchingOrders = orderHistory
+            .filter(order => order.sdt.includes(query))
+            .slice(0, 10); // Giới hạn hiển thị 10 kết quả
+
+        if (matchingOrders.length > 0) {
+            matchingOrders.forEach(order => {
+                const suggestionItem = document.createElement("div");
+                suggestionItem.className = "suggestion-item";
+                suggestionItem.textContent = order.sdt; // Chỉ hiển thị SDT
+
+                suggestionItem.addEventListener("click", () => {
+                    document.getElementById("customer-sdt").value = order.sdt; // Gán SDT vào ô nhập
+                    loadOrder(order); // Truyền đúng đối tượng order, không phải order.sdt
+                    suggestionsDiv.innerHTML = "";
+                    suggestionsDiv.style.display = "none";
+                });
+
+                suggestionsDiv.appendChild(suggestionItem);
+            });
+
+            suggestionsDiv.style.display = "block";
+        } else {
+            suggestionsDiv.style.display = "none";
+        }
+    });
 });
 
 
+  // Hàm loadOrder: nạp lại đơn hàng đã lưu vào bảng danh sách sản phẩm
+  // Hàm loadOrder: nạp lại đơn hàng đã lưu vào bảng danh sách sản phẩm
+function loadOrder(order) {
+    const listProducts = document.querySelector(".list-products");
+    // Xóa danh sách hiện có
+    listProducts.innerHTML = "";
+    
+    // Nạp lại từng sản phẩm
+    order.products.forEach(prod => {
+      const li = document.createElement("li");
+      li.className = "product-order";
+      li.innerHTML = `
+        <div class="product-item">
+          <input type="text" value="${prod.name}" class="product-name" />
+          <input type="number" min="0" value="${prod.price}" class="price-product" placeholder="giá" />
+          <input type="number" min="1" value="${prod.quantity}" class="quantity" placeholder="SL" />
+          <button class="delete-product">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      `;
+      // Gán các sự kiện cho từng sản phẩm
+      li.querySelector(".quantity").addEventListener("input", updateTotals);
+      li.querySelector(".price-product").addEventListener("input", updateTotals);
+      li.querySelector('.delete-product').addEventListener('click', function () {
+        li.remove();
+        updateTotals();
+      });
+      listProducts.appendChild(li);
+    });
+    
+    // Nạp lại các giá trị voucher và giảm giá từ đơn hàng
+    document.getElementById("voucher-item").value = order.voucher || 0;
+    document.getElementById("discount-item").value = order.discount || 0;
+    
+    // Nạp lại phí ship: duyệt qua các radio button có name "phi-ship" và đánh dấu giá trị đúng
+    const shipOptions = document.querySelectorAll("input[name='phi-ship']");
+    shipOptions.forEach(option => {
+      if (parseFloat(option.value) === order.shipFee) {
+        option.checked = true;
+      }
+    });
+    
+    updateTotals();
+}
 
-// Thêm sự kiện vào nút "Lên Đơn"
+function cleanOldOrders() {
+    chrome.storage.local.get("orderHistory", (data) => {
+      let orderHistory = data.orderHistory || [];
+      const now = new Date();
+  
+      // Lọc ra những đơn hàng có thời gian không quá 2 ngày (48 giờ)
+      const filteredOrders = orderHistory.filter(order => {
+        if (!order.orderTime) return false; // nếu không có thời gian, loại bỏ đơn đó (hoặc giữ lại tùy theo logic)
+        
+        const orderDate = new Date(order.orderTime);
+        const diffInMs = now - orderDate;
+        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+        
+        // Giữ lại các đơn hàng nếu đã qua chưa đầy 2 ngày
+        return diffInDays <= 2;
+      });
+  
+      // Nếu có đơn hàng bị xóa, cập nhật lại storage
+      if (filteredOrders.length !== orderHistory.length) {
+        chrome.storage.local.set({ orderHistory: filteredOrders }, () => {
+          console.log("Đã xóa các đơn hàng cũ hơn 2 ngày. Số đơn hàng còn lại:", filteredOrders.length);
+        });
+      } else {
+        console.log("Không có đơn hàng nào quá 2 ngày để xóa.");
+      }
+    });
+  }
+  
