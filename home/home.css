@@ -8,14 +8,16 @@ body {
   margin-bottom: 10px;
   display: flex;
   align-items: center;
-  justify-content: center; /* Căn giữa nội dung */
+  justify-content: center;
+  /* Căn giữa nội dung */
   padding: 10px 20px;
   position: relative;
 }
 
 .home-icon {
   position: absolute;
-  left: 20px; /* Đặt icon ở bên trái */
+  left: 20px;
+  /* Đặt icon ở bên trái */
   display: inline-flex;
   align-items: center;
   cursor: pointer;
@@ -59,36 +61,52 @@ body {
   text-align: center;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif; /* Font chữ chuyên nghiệp */
-  letter-spacing: 1px; /* Giãn chữ */
+  font-family: Arial, sans-serif;
+  /* Font chữ chuyên nghiệp */
+  letter-spacing: 1px;
+  /* Giãn chữ */
   text-transform: uppercase;
 }
-.table-container{
+
+.table-container {
   min-height: 500px;
   margin: 10px 0;
 }
+
 .table-wrapper {
-  max-height: 500px; /* Chiều cao tối đa cho table wrapper */
-  overflow-y: auto;  /* Thêm thanh cuộn theo chiều dọc */
-  border: 1px solid #ccc; /* Viền cho wrapper */
+  max-height: 500px;
+  /* Chiều cao tối đa cho table wrapper */
+  overflow-y: auto;
+  /* Thêm thanh cuộn theo chiều dọc */
+  border: 1px solid #ccc;
+  /* Viền cho wrapper */
 }
 
 #customers {
-  width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng */
-  border-collapse: collapse; /* Gộp các đường viền */
+  width: 100%;
+  /* Đảm bảo bảng chiếm toàn bộ chiều rộng */
+  border-collapse: collapse;
+  /* Gộp các đường viền */
 }
 
-#customers th, #customers td {
-  border: 1px solid #ddd; /* Viền cho th và td */
-  padding: 8px; /* Khoảng cách bên trong */ 
+#customers th,
+#customers td {
+  border: 1px solid #ddd;
+  /* Viền cho th và td */
+  padding: 8px;
+  /* Khoảng cách bên trong */
   font-size: 16px;
 }
 
 #customers th {
-  background-color: #f2f2f2; /* Màu nền cho tiêu đề */
-  position: sticky; /* Giữ cố định tiêu đề khi cuộn */
-  top: 0; /* Đặt vị trí ở trên cùng của bảng */
-  z-index: 1; /* Đảm bảo tiêu đề luôn nằm trên các ô khác */
+  background-color: #f2f2f2;
+  /* Màu nền cho tiêu đề */
+  position: sticky;
+  /* Giữ cố định tiêu đề khi cuộn */
+  top: 0;
+  /* Đặt vị trí ở trên cùng của bảng */
+  z-index: 1;
+  /* Đảm bảo tiêu đề luôn nằm trên các ô khác */
 }
 
 
@@ -128,17 +146,21 @@ body {
 }
 
 .hint {
-  font-size: 0.7em; /* Kích thước chữ nhỏ hơn */
-  color: #888; /* Màu xám nhạt */
-  margin-left: 1px; /* Khoảng cách giữa label và chú thích */
+  font-size: 0.7em;
+  /* Kích thước chữ nhỏ hơn */
+  color: #888;
+  /* Màu xám nhạt */
+  margin-left: 1px;
+  /* Khoảng cách giữa label và chú thích */
 }
 
-#ma-tim, #don-gia {
+#ma-tim,
+#don-gia {
   height: 40px;
   width: 120px;
 }
 
-#id-sanpham{
+#id-sanpham {
   width: 100px;
   height: 40px;
   margin-right: 10px;
@@ -242,16 +264,17 @@ body {
 .button-sua:active,
 .button-nhapex:active,
 .button-taiex:active,
-.button-xoatoanbo:active
- {
+.button-xoatoanbo:active {
   background-color: #ffdeda;
   outline: 0;
 }
-.button-xoatoanbo:hover{
+
+.button-xoatoanbo:hover {
   background-color: #ff0808;
   color: white;
   outline: 0;
 }
+
 /* Hover outline removal for all buttons */
 .button-them:hover,
 .button-sua:hover,
@@ -269,58 +292,67 @@ body {
   .button-sua,
   .button-nhapex,
   .button-taiex,
-  .button-xoatoanbo{
+  .button-xoatoanbo {
     padding: 0 30px;
   }
 }
 
-.search-container, .search-bar {
+.search-container,
+.search-bar {
   display: flex;
 }
 
 .search-bar input,
-.search-btn, 
-.search-btn:before, 
+.search-btn,
+.search-btn:before,
 .search-btn:after {
   transition: all 0.25s ease-out;
 }
+
 .search-bar input,
 .search-btn {
   width: 3em;
   height: 3em;
 }
+
 .search-bar input:invalid:not(:focus),
-.search-btn { 
+.search-btn {
   cursor: pointer;
 }
+
 .search-bar,
 .search-bar input:focus,
-.search-bar input:valid  {
+.search-bar input:valid {
   width: 100%;
 }
+
 .search-bar input:focus,
-.search-bar input:not(:focus) + .search-btn:focus {
+.search-bar input:not(:focus)+.search-btn:focus {
   outline: transparent;
 }
+
 .search-bar {
   margin: auto;
   justify-content: center;
   max-width: 500px;
 }
+
 .search-bar input {
   background: transparent;
   border-radius: 1.5em;
   box-shadow: 0 0 0 0.4em #171717 inset;
   padding: 0.75em;
-  transform: translate(0.5em,0.5em) scale(0.5);
+  transform: translate(0.5em, 0.5em) scale(0.5);
   transform-origin: 100% 0;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
 }
+
 .search-bar input::-webkit-search-decoration {
   -webkit-appearance: none;
 }
+
 .search-bar input:focus,
 .search-bar input:valid {
   background: #fff;
@@ -328,21 +360,24 @@ body {
   box-shadow: 0 0 0 0.1em #d9d9d9 inset;
   transform: scale(1);
 }
+
 .search-btn {
   background: #171717;
   border-radius: 0 0.75em 0.75em 0 / 0 1.5em 1.5em 0;
   padding: 0.75em;
   position: relative;
-  transform: translate(0.25em,0.25em) rotate(45deg) scale(0.25,0.125);
+  transform: translate(0.25em, 0.25em) rotate(45deg) scale(0.25, 0.125);
   transform-origin: 0 50%;
 }
-.search-btn:before, 
+
+.search-btn:before,
 .search-btn:after {
   content: "";
   display: block;
   opacity: 0;
   position: absolute;
 }
+
 .search-btn:before {
   border-radius: 50%;
   box-shadow: 0 0 0 0.2em #f1f1f1 inset;
@@ -351,6 +386,7 @@ body {
   width: 1.2em;
   height: 1.2em;
 }
+
 .search-btn:after {
   background: #f1f1f1;
   border-radius: 0 0.25em 0.25em 0;
@@ -358,9 +394,10 @@ body {
   left: 51%;
   width: 0.75em;
   height: 0.25em;
-  transform: translate(0.2em,0) rotate(45deg);
+  transform: translate(0.2em, 0) rotate(45deg);
   transform-origin: 0 50%;
 }
+
 .search-btn span {
   display: inline-block;
   overflow: hidden;
@@ -369,95 +406,169 @@ body {
 }
 
 /* Active state */
-.search-bar input:focus + .search-btn,
-.search-bar input:valid + .search-btn {
+.search-bar input:focus+.search-btn,
+.search-bar input:valid+.search-btn {
   background: #2762f3;
   border-radius: 0 0.375em 0.375em 0;
   transform: scale(1);
 }
-.search-bar input:focus + .search-btn:before, 
-.search-bar input:focus + .search-btn:after,
-.search-bar input:valid + .search-btn:before, 
-.search-bar input:valid + .search-btn:after {
+
+.search-bar input:focus+.search-btn:before,
+.search-bar input:focus+.search-btn:after,
+.search-bar input:valid+.search-btn:before,
+.search-bar input:valid+.search-btn:after {
   opacity: 1;
 }
-.search-bar input:focus + .search-btn:hover,
-.search-bar input:valid + .search-btn:hover,
-.search-bar input:valid:not(:focus) + .search-btn:focus {
+
+.search-bar input:focus+.search-btn:hover,
+.search-bar input:valid+.search-btn:hover,
+.search-bar input:valid:not(:focus)+.search-btn:focus {
   background: #0c48db;
 }
-.search-bar input:focus + .search-btn:active,
-.search-bar input:valid + .search-btn:active {
+
+.search-bar input:focus+.search-btn:active,
+.search-bar input:valid+.search-btn:active {
   transform: translateY(1px);
 }
 
 .size-container {
   width: 300px;
-  display: none; /* Ẩn mặc định */
+  display: none;
+  /* Ẩn mặc định */
   text-align: center;
-  position: fixed; /* Đặt vị trí cố định */
-  top: 50%; /* Đặt vị trí từ trên xuống */
-  left: 50%; /* Đặt vị trí từ bên trái */
-  transform: translate(-50%, -50%) scale(0.5); /* Căn giữa và thu nhỏ */
-  background-color: #ffffff; /* Nền trắng không trong suốt */
-  padding: 10px; /* Khoảng cách bên trong */
-  border-radius: 8px; /* Bo góc */
-  z-index: 1000; /* Đặt lớp phủ trên các phần tử khác */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng cho hiệu ứng nổi */
-  opacity: 0; /* Ẩn hoàn toàn */
-  transition: transform 0.3s ease, opacity 0.3s ease; /* Hiệu ứng chuyển đổi */
+  position: fixed;
+  /* Đặt vị trí cố định */
+  top: 50%;
+  /* Đặt vị trí từ trên xuống */
+  left: 50%;
+  /* Đặt vị trí từ bên trái */
+  transform: translate(-50%, -50%) scale(0.5);
+  /* Căn giữa và thu nhỏ */
+  background-color: #ffffff;
+  /* Nền trắng không trong suốt */
+  padding: 10px;
+  /* Khoảng cách bên trong */
+  border-radius: 8px;
+  /* Bo góc */
+  z-index: 1000;
+  /* Đặt lớp phủ trên các phần tử khác */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Đổ bóng cho hiệu ứng nổi */
+  opacity: 0;
+  /* Ẩn hoàn toàn */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  /* Hiệu ứng chuyển đổi */
   font-size: 18px;
 }
 
-.size-container h2{
+.size-container h2 {
   margin: 0;
 }
+
 /* Khi phần tử được hiển thị */
 .size-container.show {
-  display: block; /* Hiển thị */
-  opacity: 1; /* Hiện lên */
-  transform: translate(-50%, -50%) scale(1); /* Trở lại kích thước ban đầu */
+  display: block;
+  /* Hiển thị */
+  opacity: 1;
+  /* Hiện lên */
+  transform: translate(-50%, -50%) scale(1);
+  /* Trở lại kích thước ban đầu */
 }
 
 .size-product {
-  display: flex; /* Sử dụng flexbox để sắp xếp theo hàng */
-  justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
-  flex-wrap: wrap; /* Cho phép các phần tử xuống hàng nếu không vừa */
+  display: flex;
+  /* Sử dụng flexbox để sắp xếp theo hàng */
+  justify-content: center;
+  /* Căn giữa các phần tử theo chiều ngang */
+  flex-wrap: wrap;
+  /* Cho phép các phần tử xuống hàng nếu không vừa */
   row-gap: 10px;
   margin: 20px 0 10px 0;
 }
 
 .size-product input[type="checkbox"] {
-  margin: 0 10px; /* Khoảng cách giữa các ô checkbox */
+  margin: 0 10px;
+  /* Khoảng cách giữa các ô checkbox */
 }
 
 .size-product label {
-  margin: 0 5px; /* Khoảng cách giữa nhãn và ô checkbox */
+  margin: 0 5px;
+  /* Khoảng cách giữa nhãn và ô checkbox */
 }
 
-.btn-confirm, .cancel-size{
+.btn-confirm,
+.cancel-size {
   /* Màu chữ trắng */
-  background-color: #4CAF50; /* Màu nền xanh lá cây */
-  color: white; 
-  border: none; /* Không viền */
-  border-radius: 5px; /* Bo góc */
-  padding: 10px 20px; /* Khoảng cách bên trong */
-  text-align: center; /* Căn giữa chữ */
-  text-decoration: none; /* Không gạch chân */
-  display: inline-block; /* Hiển thị dạng khối nội tuyến */
-  font-size: 16px; /* Kích thước chữ */
-  margin: 10px 0; /* Khoảng cách xung quanh nút */
-  cursor: pointer; /* Con trỏ khi di chuột */
-  transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu */
-}
-.cancel-size{
-  background-color: #e94302; /* Màu nền xanh lá cây */
-  color: white; 
-}
-.btn-confirm:hover {
-  background-color: #45a049; /* Màu nền khi di chuột */
+  background-color: #4CAF50;
+  /* Màu nền xanh lá cây */
+  color: white;
+  border: none;
+  /* Không viền */
+  border-radius: 5px;
+  /* Bo góc */
+  padding: 10px 20px;
+  /* Khoảng cách bên trong */
+  text-align: center;
+  /* Căn giữa chữ */
+  text-decoration: none;
+  /* Không gạch chân */
+  display: inline-block;
+  /* Hiển thị dạng khối nội tuyến */
+  font-size: 16px;
+  /* Kích thước chữ */
+  margin: 10px 0;
+  /* Khoảng cách xung quanh nút */
+  cursor: pointer;
+  /* Con trỏ khi di chuột */
+  transition: background-color 0.3s ease;
+  /* Hiệu ứng chuyển màu */
 }
 
-.cancel-size:hover{
-  background-color: #d63e02; 
+.cancel-size {
+  background-color: #e94302;
+  /* Màu nền xanh lá cây */
+  color: white;
 }
+
+.btn-confirm:hover {
+  background-color: #45a049;
+  /* Màu nền khi di chuột */
+}
+
+.cancel-size:hover {
+  background-color: #d63e02;
+}
+
+.center-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Điều chỉnh tùy theo thiết kế */
+}
+
+.link-product {
+  text-align: center;
+}
+
+.link-product a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  position: relative;
+}
+
+.link-product a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background-color: #5dbe30;
+  transition: width 0.3s ease-in-out;
+}
+
+.link-product a:hover::after {
+  width: 100%;
+}
+
