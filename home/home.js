@@ -7,7 +7,57 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Nội dung HTML đã được tải xong!");
     // Tăng số lần trang mở
     incrementPageOpenCount();
+    
 });
+
+// Hàm khởi tạo dữ liệu mẫu
+function initializeSampleProducts() {
+    chrome.storage.local.get("productList", (data) => {
+        // Chỉ thêm dữ liệu mẫu nếu productList chưa tồn tại
+        if (!data.productList || data.productList.length === 0) {
+            const sampleProducts = [
+                {
+                    id: currentId++,
+                    maTim: "C122-S",
+                    tenHienThi: "C122 Áo trắng trơn cổ trụ S",
+                    donGia: 280,
+                    hethang: false
+                },
+                {
+                    id: currentId++,
+                    maTim: "C122-M",
+                    tenHienThi: "C122 Áo trắng trơn cổ trụ M",
+                    donGia: 280,
+                    hethang: true
+                },
+                {
+                    id: currentId++,
+                    maTim: "T456-L",
+                    tenHienThi: "T456 Quần jeans xanh L",
+                    donGia: 450,
+                    hethang: false
+                },
+                {
+                    id: currentId++,
+                    maTim: "T456-XL",
+                    tenHienThi: "T456 Quần jeans xanh XL",
+                    donGia: 450,
+                    hethang: true
+                },
+                {
+                    id: currentId++,
+                    maTim: "S789-FR",
+                    tenHienThi: "S789 Áo sơ mi caro FR",
+                    donGia: 320,
+                    hethang: false
+                }
+            ];
+            chrome.storage.local.set({ productList: sampleProducts }, () => {
+                console.log("Đã khởi tạo dữ liệu mẫu!");
+            });
+        }
+    });
+}
 
 function incrementPageOpenCount() {
     // Lấy thẻ input ẩn để ghi nhận số lần mở trang
@@ -71,6 +121,12 @@ function displayProducts() {
                 deleteButton.className = "button-xoa";
                 deleteCell.appendChild(deleteButton);
 
+                const statusCell = newRow.insertCell(5);
+                const statusButton = document.createElement("button");
+                statusButton.innerText = product.hethang ? "Hết" : "Còn";
+                statusButton.className = product.hethang ? "button-het" : "button-con";
+                statusCell.appendChild(statusButton);
+
                 // Thêm sự kiện click để sửa dữ liệu
                 newRow.addEventListener("click", () => {
                     document.getElementById("id-sanpham").value = product.id; // Hiển thị ID
@@ -85,6 +141,15 @@ function displayProducts() {
                     event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
                     removeProduct(product.id); // Xóa theo ID
                     displayProducts(); // Cập nhật lại bảng
+                });
+
+                // Chuyển đổi trạng thái hết hàng khi nhấn nút trạng thái
+                statusButton.addEventListener("click", (event) => {
+                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
+                    product.hethang = !product.hethang; // Đảo trạng thái
+                    chrome.storage.local.set({ productList: data.productList }, () => {
+                        displayProducts(); // Cập nhật lại bảng
+                    });
                 });
             });
             currentId = data.productList.length + 1; // Cập nhật ID cho sản phẩm tiếp theo
@@ -142,7 +207,8 @@ function addProduct() {
             id: currentId++, // Tăng ID
             maTim: `${maTim}-${size}`, // Thêm size vào mã tìm
             tenHienThi: `${maTim} ${tenHienThi} ${size}`, // Nối mã tìm vào tên hiển thị với size
-            donGia
+            donGia,
+            hethang: false // Mặc định hết hàng là false
         }));
 
         // Lưu sản phẩm mới vào danh sách
@@ -193,6 +259,7 @@ function updateProduct() {
         existingProduct.maTim = maTim;
         existingProduct.tenHienThi = tenHienThi;
         existingProduct.donGia = donGia;
+        // Giữ nguyên hethang
 
         chrome.storage.local.set({ productList }, () => {
             displayProducts(); // Cập nhật bảng
@@ -279,7 +346,8 @@ document.getElementById('file-input').addEventListener('change', (event) => {
             id: currentId++, // Tạo ID tự động
             maTim: row[0] ? row[0].toUpperCase() : '', // Cột A
             tenHienThi: row[1], // Cột B
-            donGia: row[2] // Cột C
+            donGia: row[2], // Cột C
+            hethang: row[3] === "Hết" || row[3] === true // Cột D: Chuyển "Hết" hoặc true thành true, còn lại là false
         })).filter(product => product.maTim && product.tenHienThi && product.donGia); // Bỏ qua các sản phẩm không hợp lệ
 
         // Lưu sản phẩm vào local storage
@@ -306,9 +374,9 @@ function downloadExcelFile() {
         const productList = data.productList || [];
 
         // Chuyển đổi dữ liệu thành định dạng 2D array cho Excel
-        const excelData = [["Mã tìm", "Tên hiển thị", "Giá"]]; // Tiêu đề cột
+        const excelData = [["Mã tìm", "Tên hiển thị", "Giá", "Trạng Thái"]]; // Tiêu đề cột
         productList.forEach(product => {
-            excelData.push([product.maTim, product.tenHienThi, product.donGia]);
+            excelData.push([product.maTim, product.tenHienThi, product.donGia, product.hethang ? "Hết" : "Còn"]);
         });
 
         // Tạo workbook và worksheet
@@ -363,8 +431,9 @@ function searchProducts(searchTerm) {
                 const maTimMatch = product.maTim.toLowerCase().includes(searchTerm);
                 const tenHienThiMatch = product.tenHienThi.toLowerCase().includes(searchTerm);
                 const donGiaMatch = String(product.donGia).toLowerCase().includes(searchTerm); // Chuyển đổi donGia thành chuỗi
+                const hethangMatch = (product.hethang ? "hết" : "còn").includes(searchTerm); // Tìm kiếm theo trạng thái
 
-                return maTimMatch || tenHienThiMatch || donGiaMatch; // Tìm kiếm theo mã tìm, tên hiển thị hoặc giá
+                return maTimMatch || tenHienThiMatch || donGiaMatch || hethangMatch; // Tìm kiếm theo mã tìm, tên hiển thị, giá hoặc trạng thái
             });
 
             filteredProducts.forEach(product => {
@@ -379,6 +448,12 @@ function searchProducts(searchTerm) {
                 deleteButton.innerText = "Xóa";
                 deleteButton.className = "button-xoa";
                 deleteCell.appendChild(deleteButton);
+
+                const statusCell = newRow.insertCell(5);
+                const statusButton = document.createElement("button");
+                statusButton.innerText = product.hethang ? "Hết" : "Còn";
+                statusButton.className = product.hethang ? "button-het" : "button-con";
+                statusCell.appendChild(statusButton);
 
                 // Thêm sự kiện click để sửa dữ liệu
                 newRow.addEventListener("click", () => {
@@ -395,8 +470,16 @@ function searchProducts(searchTerm) {
                     removeProduct(product.id); // Xóa theo ID
                     displayProducts(); // Cập nhật lại bảng
                 });
+
+                // Chuyển đổi trạng thái hết hàng khi nhấn nút trạng thái
+                statusButton.addEventListener("click", (event) => {
+                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
+                    product.hethang = !product.hethang; // Đảo trạng thái
+                    chrome.storage.local.set({ productList: data.productList }, () => {
+                        displayProducts(); // Cập nhật lại bảng
+                    });
+                });
             });
         }
     });
 }
-
