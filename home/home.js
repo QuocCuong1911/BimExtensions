@@ -1,13 +1,17 @@
 // Khai báo biến toàn cục để lưu sản phẩm đang chỉnh sửa
 let currentEditProduct = null;
 let currentId = 1; // Khởi tạo ID bắt đầu từ 1
+let lastSearchTerm = ''; // Lưu từ khóa tìm kiếm cuối cùng
 
 document.addEventListener('DOMContentLoaded', function() {
     // Thực hiện hành động khi HTML được tải xong
     console.log("Nội dung HTML đã được tải xong!");
     // Tăng số lần trang mở
     incrementPageOpenCount();
-    
+    // Hiển thị sản phẩm khi tải trang
+    displayProducts();
+    // Khởi tạo dữ liệu mẫu
+    initializeSampleProducts();
 });
 
 // Hàm khởi tạo dữ liệu mẫu
@@ -96,7 +100,7 @@ document.querySelector('.home-icon').addEventListener('click', function() {
 });
 
 // Hàm hiển thị dữ liệu sản phẩm từ local storage
-function displayProducts() {
+function displayProducts(searchTerm = '') {
     chrome.storage.local.get("productList", (data) => {
         const table = document.getElementById("customers");
         const rows = table.getElementsByTagName("tr");
@@ -106,54 +110,83 @@ function displayProducts() {
             table.deleteRow(i);
         }
 
-        // Nếu có dữ liệu, hiển thị từng sản phẩm
-        if (data.productList) {
-            data.productList.forEach(product => {
-                const newRow = table.insertRow();
-                newRow.insertCell(0).innerText = product.id; // Hiển thị ID
-                newRow.insertCell(1).innerText = product.maTim;
-                newRow.insertCell(2).innerText = product.tenHienThi;
-                newRow.insertCell(3).innerText = product.donGia;
+        let filteredProducts = data.productList || [];
 
-                const deleteCell = newRow.insertCell(4);
-                const deleteButton = document.createElement("button");
-                deleteButton.innerText = "Xóa";
-                deleteButton.className = "button-xoa";
-                deleteCell.appendChild(deleteButton);
+        // Nếu có từ khóa tìm kiếm, lọc sản phẩm
+        if (searchTerm) {
+            filteredProducts = searchProducts(searchTerm, data.productList);
+        }
 
-                const statusCell = newRow.insertCell(5);
-                const statusButton = document.createElement("button");
-                statusButton.innerText = product.hethang ? "Hết" : "Còn";
-                statusButton.className = product.hethang ? "button-het" : "button-con";
-                statusCell.appendChild(statusButton);
+        // Hiển thị danh sách sản phẩm (đã lọc hoặc toàn bộ)
+        filteredProducts.forEach(product => {
+            const newRow = table.insertRow();
+            newRow.insertCell(0).innerText = product.id; // Hiển thị ID
+            newRow.insertCell(1).innerText = product.maTim;
+            newRow.insertCell(2).innerText = product.tenHienThi;
+            newRow.insertCell(3).innerText = product.donGia;
 
-                // Thêm sự kiện click để sửa dữ liệu
-                newRow.addEventListener("click", () => {
-                    document.getElementById("id-sanpham").value = product.id; // Hiển thị ID
-                    document.getElementById("ma-tim").value = product.maTim;
-                    document.getElementById("ten-hien-thi").value = product.tenHienThi;
-                    document.getElementById("don-gia").value = product.donGia;
-                    currentEditProduct = product; // Lưu sản phẩm hiện tại để sửa
-                });
+            const deleteCell = newRow.insertCell(4);
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Xóa";
+            deleteButton.className = "button-xoa";
+            deleteCell.appendChild(deleteButton);
 
-                // Xóa sản phẩm khỏi storage và giao diện khi nhấn nút "Xóa"
-                deleteButton.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
-                    removeProduct(product.id); // Xóa theo ID
-                    displayProducts(); // Cập nhật lại bảng
-                });
+            const statusCell = newRow.insertCell(5);
+            const statusButton = document.createElement("button");
+            statusButton.innerText = product.hethang ? "Hết" : "Còn";
+            statusButton.className = product.hethang ? "button-het" : "button-con";
+            statusCell.appendChild(statusButton);
 
-                // Chuyển đổi trạng thái hết hàng khi nhấn nút trạng thái
-                statusButton.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
-                    product.hethang = !product.hethang; // Đảo trạng thái
-                    chrome.storage.local.set({ productList: data.productList }, () => {
-                        displayProducts(); // Cập nhật lại bảng
-                    });
+            // Thêm sự kiện click để sửa dữ liệu
+            newRow.addEventListener("click", () => {
+                document.getElementById("id-sanpham").value = product.id; // Hiển thị ID
+                document.getElementById("ma-tim").value = product.maTim;
+                document.getElementById("ten-hien-thi").value = product.tenHienThi;
+                document.getElementById("don-gia").value = product.donGia;
+                currentEditProduct = product; // Lưu sản phẩm hiện tại để sửa
+            });
+
+            // Xóa sản phẩm
+            deleteButton.addEventListener("click", (event) => {
+                event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
+                removeProduct(product.id); // Xóa theo ID
+                displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
+            });
+
+            // Chuyển đổi trạng thái hết hàng
+            statusButton.addEventListener("click", (event) => {
+                event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
+                product.hethang = !product.hethang; // Đảo trạng thái
+                chrome.storage.local.set({ productList: data.productList }, () => {
+                    displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
                 });
             });
-            currentId = data.productList.length + 1; // Cập nhật ID cho sản phẩm tiếp theo
-        }
+        });
+
+        // Cập nhật currentId cho sản phẩm tiếp theo
+        currentId = Math.max(...(data.productList || []).map(p => p.id), 0) + 1;
+    });
+}
+
+// Hàm tìm kiếm sản phẩm
+function searchProducts(searchTerm, productList) {
+    // Tách từ khóa thành mảng các từ (loại bỏ khoảng trắng thừa)
+    const keywords = searchTerm.toLowerCase().trim().split(/\s+/);
+    
+    return productList.filter(product => {
+        // Chuyển các trường thành chuỗi và chuẩn hóa
+        const maTim = product.maTim.toLowerCase();
+        const tenHienThi = product.tenHienThi.toLowerCase();
+        const donGia = String(product.donGia).toLowerCase();
+        const hethang = product.hethang ? "hết" : "còn";
+
+        // Kiểm tra xem tất cả từ khóa có xuất hiện trong bất kỳ trường nào không
+        return keywords.every(keyword => 
+            maTim.includes(keyword) ||
+            tenHienThi.includes(keyword) ||
+            donGia.includes(keyword) ||
+            hethang.includes(keyword)
+        );
     });
 }
 
@@ -216,7 +249,7 @@ function addProduct() {
             const productList = data.productList || [];
             productList.push(...newProducts); // Thêm nhiều sản phẩm vào danh sách
             chrome.storage.local.set({ productList }, () => {
-                displayProducts(); // Cập nhật bảng
+                displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
             });
         });
 
@@ -228,9 +261,6 @@ function addProduct() {
         sizeContainer.classList.remove('show');
     };
 }
-document.querySelector(".button-them").addEventListener("click", addProduct);
-
-
 
 // Hàm sửa sản phẩm
 function updateProduct() {
@@ -262,7 +292,7 @@ function updateProduct() {
         // Giữ nguyên hethang
 
         chrome.storage.local.set({ productList }, () => {
-            displayProducts(); // Cập nhật bảng
+            displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
         });
 
         // Xóa dữ liệu trong ô input sau khi sửa
@@ -277,7 +307,7 @@ function removeProduct(id) {
         const updatedProductList = productList.filter(product => product.id != id); // Xóa theo ID
 
         chrome.storage.local.set({ productList: updatedProductList }, () => {
-            displayProducts(); // Cập nhật bảng
+            displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
         });
     });
 }
@@ -295,7 +325,7 @@ document.querySelector(".button-xoatoanbo").addEventListener("click", () => {
 // Hàm xóa toàn bộ sản phẩm
 function clearAllProducts() {
     chrome.storage.local.set({ productList: [] }, () => {
-        displayProducts(); // Cập nhật bảng
+        displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
         alert("Đã xóa toàn bộ dữ liệu."); // Thông báo đã xóa thành công
     });
 }
@@ -308,18 +338,10 @@ function clearInputs() {
     document.getElementById("don-gia").value = "";
 }
 
-function showSizeSelector() {
-    const sizeContainer = document.querySelector('.size-container');
-    sizeContainer.classList.add('show'); // Hiển thị phần chọn kích thước
-}
-
 // Lắng nghe sự kiện khi nhấn nút "Thêm"
 document.querySelector(".button-them").addEventListener("click", addProduct);
 // Lắng nghe sự kiện khi nhấn nút "Sửa"
 document.querySelector(".button-sua").addEventListener("click", updateProduct);
-
-// Tải dữ liệu khi mở trang
-document.addEventListener("DOMContentLoaded", displayProducts);
 
 // Excel
 document.querySelector('.button-nhapex').addEventListener('click', () => {
@@ -355,14 +377,13 @@ document.getElementById('file-input').addEventListener('change', (event) => {
             const existingProducts = data.productList || [];
             const updatedProducts = existingProducts.concat(productList);
             chrome.storage.local.set({ productList: updatedProducts }, () => {
-                displayProducts(); // Cập nhật bảng
+                displayProducts(lastSearchTerm); // Hiển thị lại danh sách đã lọc
             });
         });
     };
 
     reader.readAsArrayBuffer(file);
 });
-
 
 // Lắng nghe sự kiện khi nhấn nút "Tải Excel"
 document.querySelector('.button-taiex').addEventListener('click', downloadExcelFile);
@@ -393,93 +414,8 @@ function downloadExcelFile() {
     });
 }
 
-
 // Lắng nghe sự kiện nhập vào thanh tìm kiếm
 document.querySelector('input[name="search"]').addEventListener('input', function (event) {
-    const searchTerm = event.target.value.toLowerCase(); // Lấy giá trị nhập vào
-
-    if (searchTerm === "") {
-        // Nếu không có ký tự nào, hiển thị tất cả sản phẩm
-        displayProducts();
-    } else {
-        // Nếu có ký tự, gọi hàm tìm kiếm
-        searchProducts(searchTerm);
-    }
+    lastSearchTerm = event.target.value.toLowerCase(); // Cập nhật từ khóa tìm kiếm
+    displayProducts(lastSearchTerm); // Hiển thị danh sách đã lọc
 });
-
-// Hàm tìm kiếm sản phẩm
-function searchProducts(searchTerm) {
-    // Lấy dữ liệu sản phẩm từ local storage
-    chrome.storage.local.get("productList", (data) => {
-        const table = document.getElementById("customers");
-        const rows = table.getElementsByTagName("tr");
-
-        // Xóa các hàng dữ liệu (giữ lại hàng tiêu đề)
-        for (let i = rows.length - 1; i > 0; i--) {
-            table.deleteRow(i);
-        }
-
-        // Nếu không có từ khóa tìm kiếm, hiển thị toàn bộ sản phẩm
-        if (!searchTerm) {
-            displayProducts(); // Gọi hàm để hiển thị tất cả sản phẩm
-            return; // Kết thúc hàm
-        }
-
-        // Nếu có dữ liệu, hiển thị các sản phẩm tìm thấy
-        if (data.productList) {
-            const filteredProducts = data.productList.filter(product => {
-                const maTimMatch = product.maTim.toLowerCase().includes(searchTerm);
-                const tenHienThiMatch = product.tenHienThi.toLowerCase().includes(searchTerm);
-                const donGiaMatch = String(product.donGia).toLowerCase().includes(searchTerm); // Chuyển đổi donGia thành chuỗi
-                const hethangMatch = (product.hethang ? "hết" : "còn").includes(searchTerm); // Tìm kiếm theo trạng thái
-
-                return maTimMatch || tenHienThiMatch || donGiaMatch || hethangMatch; // Tìm kiếm theo mã tìm, tên hiển thị, giá hoặc trạng thái
-            });
-
-            filteredProducts.forEach(product => {
-                const newRow = table.insertRow();
-                newRow.insertCell(0).innerText = product.id; // Hiển thị ID
-                newRow.insertCell(1).innerText = product.maTim;
-                newRow.insertCell(2).innerText = product.tenHienThi;
-                newRow.insertCell(3).innerText = product.donGia;
-
-                const deleteCell = newRow.insertCell(4);
-                const deleteButton = document.createElement("button");
-                deleteButton.innerText = "Xóa";
-                deleteButton.className = "button-xoa";
-                deleteCell.appendChild(deleteButton);
-
-                const statusCell = newRow.insertCell(5);
-                const statusButton = document.createElement("button");
-                statusButton.innerText = product.hethang ? "Hết" : "Còn";
-                statusButton.className = product.hethang ? "button-het" : "button-con";
-                statusCell.appendChild(statusButton);
-
-                // Thêm sự kiện click để sửa dữ liệu
-                newRow.addEventListener("click", () => {
-                    document.getElementById("id-sanpham").value = product.id; // Hiển thị ID
-                    document.getElementById("ma-tim").value = product.maTim;
-                    document.getElementById("ten-hien-thi").value = product.tenHienThi;
-                    document.getElementById("don-gia").value = product.donGia;
-                    currentEditProduct = product; // Lưu sản phẩm hiện tại để sửa
-                });
-
-                // Xóa sản phẩm khỏi storage và giao diện khi nhấn nút "Xóa"
-                deleteButton.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
-                    removeProduct(product.id); // Xóa theo ID
-                    displayProducts(); // Cập nhật lại bảng
-                });
-
-                // Chuyển đổi trạng thái hết hàng khi nhấn nút trạng thái
-                statusButton.addEventListener("click", (event) => {
-                    event.stopPropagation(); // Ngăn chặn sự kiện click trên dòng
-                    product.hethang = !product.hethang; // Đảo trạng thái
-                    chrome.storage.local.set({ productList: data.productList }, () => {
-                        displayProducts(); // Cập nhật lại bảng
-                    });
-                });
-            });
-        }
-    });
-}
