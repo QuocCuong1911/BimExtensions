@@ -37,5 +37,8 @@
   },
   "action": {
     "default_title": "Open Product Manager"
-  }
+  },
+  "host_permissions": [
+    "https://*.firebaseio.com/"
+  ]
 }

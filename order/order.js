@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+    initializeFirebase();
     cleanOldOrders();
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
@@ -6,7 +7,60 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     console.log("Nội dung HTML đã được tải xong!");
     incrementPageOpenCount();
+    // Lắng nghe thay đổi từ Firebase để đồng bộ dữ liệu
+    listenForProductListChanges();
 });
+
+// Khởi tạo Firebase
+let db;
+function initializeFirebase() {
+    if (typeof firebase === 'undefined') {
+        console.error("Firebase SDK không được tải. Vui lòng kiểm tra lại file HTML và script Firebase.");
+        return;
+    }
+    const firebaseConfig = {
+        apiKey: "AIzaSyD8I5hLFV7E2oNl5ZVA_ZQMyNqmUTrfwlk",
+        authDomain: "myextensionsync.firebaseapp.com",
+        databaseURL: "https://myextensionsync-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "myextensionsync",
+        storageBucket: "myextensionsync.firebasestorage.app",
+        messagingSenderId: "489073226857",
+        appId: "1:489073226857:web:58f011fdf25dbbb6885ef8",
+        measurementId: "G-TGZLB7Y1NP"
+    };
+    const app = firebase.initializeApp(firebaseConfig);
+    db = firebase.database(app);
+}
+// Lắng nghe thay đổi từ Firebase
+function listenForProductListChanges() {
+    const productListRef = db.ref('productList');
+    productListRef.on('value', (snapshot) => {
+        const productList = snapshot.val() || [];
+        console.log("Dữ liệu productList đồng bộ từ Firebase:", productList);
+        // Cập nhật giao diện nếu cần
+        updateUIWithProductList(productList);
+    });
+}
+
+// Cập nhật giao diện dựa trên productList từ Firebase
+function updateUIWithProductList(productList) {
+    const allProducts = document.querySelectorAll('.product-order');
+    allProducts.forEach(productLi => {
+        const productName = productLi.querySelector('.product-name').value.trim();
+        if (productName) {
+            const product = productList.find(p => p.tenHienThi === productName);
+            if (product) {
+                const hethang = product.hethang;
+                const statusIcon = productLi.querySelector('.status-icon');
+                const iconElement = statusIcon.querySelector('i');
+                iconElement.classList.remove('fa-circle-check', 'fa-exclamation-circle');
+                iconElement.classList.add(hethang ? 'fa-exclamation-circle' : 'fa-circle-check');
+                const productNameInput = productLi.querySelector('.product-name');
+                productNameInput.classList.toggle('out-of-stock', hethang);
+            }
+        }
+    });
+}
 
 function incrementPageOpenCount() {
     const pageOpenCountInput = document.getElementById('pageOpenCount2');
@@ -42,7 +96,7 @@ function updateAllProductStatuses(productName, newHethangStatus) {
         const currentProductName = productLi.querySelector('.product-name').value.trim();
         if (currentProductName === productName) {
             const statusIcon = productLi.querySelector('.status-icon');
-            const iconElement = statusIcon.querySelector('i'); // Lấy thẻ <i> bên trong
+            const iconElement = statusIcon.querySelector('i');
             iconElement.classList.remove('fa-circle-check', 'fa-exclamation-circle');
             iconElement.classList.add(newHethangStatus ? 'fa-exclamation-circle' : 'fa-circle-check');
             const productNameInput = productLi.querySelector('.product-name');
@@ -53,16 +107,21 @@ function updateAllProductStatuses(productName, newHethangStatus) {
 
 // Hàm đảo ngược trạng thái hethang
 function toggleHethang(productName, liElement) {
-    chrome.storage.local.get(['productList'], (result) => {
-        let productList = result.productList || [];
+    const productListRef = db.ref('productList');
+    productListRef.once('value', (snapshot) => {
+        let productList = snapshot.val() || [];
         const productIndex = productList.findIndex(p => p.tenHienThi === productName);
         if (productIndex !== -1) {
             // Đảo ngược trạng thái hethang
             productList[productIndex].hethang = !productList[productIndex].hethang;
-            // Lưu lại productList
-            chrome.storage.local.set({ productList }, () => {
-                // Đồng bộ trạng thái cho tất cả sản phẩm có cùng tên
-                updateAllProductStatuses(productName, productList[productIndex].hethang);
+            // Lưu lại productList lên Firebase
+            productListRef.set(productList, (error) => {
+                if (error) {
+                    console.error("Lỗi khi lưu productList lên Firebase:", error);
+                } else {
+                    console.log("Đã lưu productList lên Firebase");
+                    // Cập nhật giao diện (Firebase listener sẽ tự động làm điều này)
+                }
             });
         }
     });
@@ -102,12 +161,13 @@ document.querySelector('.add-button').addEventListener('click', function () {
     newProduct.querySelector('.product-name').addEventListener('input', function () {
         const productName = this.value.trim();
         if (productName) {
-            chrome.storage.local.get(['productList'], (result) => {
-                let productList = result.productList || [];
+            const productListRef = db.ref('productList');
+            productListRef.once('value', (snapshot) => {
+                let productList = snapshot.val() || [];
                 const product = productList.find(p => p.tenHienThi === productName);
                 if (product) {
                     const statusIcon = newProduct.querySelector('.status-icon');
-                    const iconElement = statusIcon.querySelector('i'); // Lấy thẻ <i> bên trong
+                    const iconElement = statusIcon.querySelector('i');
                     iconElement.classList.remove('fa-circle-check', 'fa-exclamation-circle');
                     iconElement.classList.add(product.hethang ? 'fa-exclamation-circle' : 'fa-circle-check');
                     newProduct.querySelector('.product-name').classList.toggle('out-of-stock', product.hethang);
@@ -143,69 +203,68 @@ document.querySelector(".search-bar-order input").addEventListener("input", func
         suggestionsContainer.style.display = "none";
         return;
     }
-    chrome.storage.local.get("productList", (data) => {
-        if (data.productList) {
-            const queryTerms = query.split(" ").filter(term => term.trim() !== "");
-            const filteredProducts = data.productList.filter(product => {
-                return queryTerms.every(term => {
-                    return (
-                        product.maTim.toLowerCase().includes(term) ||
-                        product.tenHienThi.toLowerCase().includes(term) ||
-                        product.donGia.toString().includes(term)
-                    );
-                });
+    const productListRef = db.ref('productList');
+    productListRef.once('value', (snapshot) => {
+        const productList = snapshot.val() || [];
+        const queryTerms = query.split(" ").filter(term => term.trim() !== "");
+        const filteredProducts = productList.filter(product => {
+            return queryTerms.every(term => {
+                return (
+                    product.maTim.toLowerCase().includes(term) ||
+                    product.tenHienThi.toLowerCase().includes(term) ||
+                    product.donGia.toString().includes(term)
+                );
             });
-            if (filteredProducts.length > 0) {
-                filteredProducts.slice(0, 10).forEach(product => {
-                    const suggestionItem = document.createElement("div");
-                    suggestionItem.className = "suggestion-item";
-                    if (product.hethang) {
-                        suggestionItem.classList.add("out-of-stock");
+        });
+        if (filteredProducts.length > 0) {
+            filteredProducts.slice(0, 10).forEach(product => {
+                const suggestionItem = document.createElement("div");
+                suggestionItem.className = "suggestion-item";
+                if (product.hethang) {
+                    suggestionItem.classList.add("out-of-stock");
+                }
+                suggestionItem.innerText = product.tenHienThi;
+                suggestionItem.addEventListener("click", () => {
+                    const newLi = document.createElement("li");
+                    newLi.className = "product-order";
+                    const iconClass = product.hethang ? 'fa-exclamation-circle' : 'fa-circle-check';
+                    newLi.innerHTML = `
+                        <div class="product-item">
+                            <span class="status-icon"><i class="fa-solid ${iconClass}"></i></span>
+                            <input type="text" value="${product.tenHienThi}" class="product-name${product.hethang ? ' out-of-stock' : ''}"/>
+                            <input class="price-product" min="0" value="${product.donGia}" type="number" />
+                            <input class="quantity" value="1" min="1" type="number" />
+                            <button class="delete-product">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    const productList = document.querySelector(".list-products");
+                    if (productList) {
+                        productList.appendChild(newLi);
+                        newLi.querySelector(".quantity").addEventListener("input", updateTotals);
+                        newLi.querySelector(".price-product").addEventListener("input", updateTotals);
+                        newLi.querySelector(".delete-product").addEventListener("click", (event) => {
+                            event.stopPropagation();
+                            newLi.remove();
+                            updateTotals();
+                        });
+                        newLi.querySelector('.status-icon').addEventListener('click', () => {
+                            toggleHethang(product.tenHienThi, newLi);
+                        });
                     }
-                    suggestionItem.innerText = product.tenHienThi;
-                    suggestionItem.addEventListener("click", () => {
-                        const newLi = document.createElement("li");
-                        newLi.className = "product-order";
-                        const iconClass = product.hethang ? 'fa-exclamation-circle' : 'fa-circle-check';
-                        newLi.innerHTML = `
-                            <div class="product-item">
-                                <span class="status-icon"><i class="fa-solid ${iconClass}"></i></span>
-                                <input type="text" value="${product.tenHienThi}" class="product-name${product.hethang ? ' out-of-stock' : ''}"/>
-                                <input class="price-product" min="0" value="${product.donGia}" type="number" />
-                                <input class="quantity" value="1" min="1" type="number" />
-                                <button class="delete-product">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        `;
-                        const productList = document.querySelector(".list-products");
-                        if (productList) {
-                            productList.appendChild(newLi);
-                            newLi.querySelector(".quantity").addEventListener("input", updateTotals);
-                            newLi.querySelector(".price-product").addEventListener("input", updateTotals);
-                            newLi.querySelector(".delete-product").addEventListener("click", (event) => {
-                                event.stopPropagation();
-                                newLi.remove();
-                                updateTotals();
-                            });
-                            // Thêm sự kiện toggle cho icon
-                            newLi.querySelector('.status-icon').addEventListener('click', () => {
-                                toggleHethang(product.tenHienThi, newLi);
-                            });
-                        }
-                        updateTotals();
-                        suggestionsContainer.innerHTML = "";
-                        suggestionsContainer.style.display = "none";
-                    });
-                    suggestionsContainer.appendChild(suggestionItem);
-                    const separator = document.createElement("div");
-                    separator.className = "separator";
-                    suggestionsContainer.appendChild(separator);
+                    updateTotals();
+                    suggestionsContainer.innerHTML = "";
+                    suggestionsContainer.style.display = "none";
                 });
-                suggestionsContainer.style.display = "block";
-            } else {
-                suggestionsContainer.style.display = "none";
-            }
+                suggestionsContainer.appendChild(suggestionItem);
+                const separator = document.createElement("div");
+                separator.className = "separator";
+                suggestionsContainer.appendChild(separator);
+            });
+            suggestionsContainer.style.display = "block";
+        } else {
+            suggestionsContainer.style.display = "none";
         }
     });
 });
@@ -368,23 +427,28 @@ function saveOrderToStorage(products) {
         products: Array.from(products).map(product => ({
             name: product.querySelector('.product-name').value,
             price: parseFloat(product.querySelector('.price-product').value) || 0,
-            quantity: parseInt(product.querySelector('.quantity').value) || 1
+            quantity: flushSyncInt(product.querySelector('.quantity').value) || 1
         })),
         voucher: voucher,
         discount: discount,
         shipFee: shipFee,
         orderTime: new Date().toISOString()
     };
-    chrome.storage.local.get("orderHistory", (data) => {
-        let orderHistory = data.orderHistory || [];
+    const orderHistoryRef = db.ref('orderHistory');
+    orderHistoryRef.once('value', (snapshot) => {
+        let orderHistory = snapshot.val() || [];
         const existingOrderIndex = orderHistory.findIndex(order => order.sdt === sdt);
         if (existingOrderIndex !== -1) {
             orderHistory[existingOrderIndex] = newOrder;
         } else {
             orderHistory.push(newOrder);
         }
-        chrome.storage.local.set({ orderHistory: orderHistory }, () => {
-            console.log("Đơn hàng đã được lưu/cập nhật:", newOrder);
+        orderHistoryRef.set(orderHistory, (error) => {
+            if (error) {
+                console.error("Lỗi khi lưu orderHistory lên Firebase:", error);
+            } else {
+                console.log("Đã lưu orderHistory lên Firebase:", newOrder);
+            }
         });
     });
 }
@@ -398,8 +462,9 @@ document.getElementById("customer-sdt").addEventListener("input", function () {
         suggestionsDiv.style.display = "none";
         return;
     }
-    chrome.storage.local.get("orderHistory", (data) => {
-        const orderHistory = data.orderHistory || [];
+    const orderHistoryRef = db.ref('orderHistory');
+    orderHistoryRef.once('value', (snapshot) => {
+        const orderHistory = snapshot.val() || [];
         const matchingOrders = orderHistory
             .filter(order => order.sdt.includes(query))
             .slice(0, 10);
@@ -427,12 +492,12 @@ document.getElementById("customer-sdt").addEventListener("input", function () {
 function loadOrder(order) {
     const listProducts = document.querySelector(".list-products");
     listProducts.innerHTML = "";
-    chrome.storage.local.get(['productList'], (result) => {
-        let productList = result.productList || [];
+    const productListRef = db.ref('productList');
+    productListRef.once('value', (snapshot) => {
+        let productList = snapshot.val() || [];
         order.products.forEach(prod => {
             const li = document.createElement("li");
             li.className = "product-order";
-            // Kiểm tra trạng thái hethang từ productList
             const product = productList.find(p => p.tenHienThi === prod.name);
             const hethang = product ? product.hethang : false;
             const iconClass = hethang ? 'fa-exclamation-circle' : 'fa-circle-check';
@@ -453,7 +518,6 @@ function loadOrder(order) {
                 li.remove();
                 updateTotals();
             });
-            // Thêm sự kiện toggle cho icon
             li.querySelector('.status-icon').addEventListener('click', () => {
                 const productName = li.querySelector('.product-name').value.trim();
                 if (productName) {
@@ -475,8 +539,9 @@ function loadOrder(order) {
 }
 
 function cleanOldOrders() {
-    chrome.storage.local.get("orderHistory", (data) => {
-        let orderHistory = data.orderHistory || [];
+    const orderHistoryRef = db.ref('orderHistory');
+    orderHistoryRef.once('value', (snapshot) => {
+        let orderHistory = snapshot.val() || [];
         const now = new Date();
         const filteredOrders = orderHistory.filter(order => {
             if (!order.orderTime) return false;
@@ -486,8 +551,12 @@ function cleanOldOrders() {
             return diffInDays <= 2;
         });
         if (filteredOrders.length !== orderHistory.length) {
-            chrome.storage.local.set({ orderHistory: filteredOrders }, () => {
-                console.log("Đã xóa các đơn hàng cũ hơn 2 ngày. Số đơn hàng còn lại:", filteredOrders.length);
+            orderHistoryRef.set(filteredOrders, (error) => {
+                if (error) {
+                    console.error("Lỗi khi xóa đơn hàng cũ trên Firebase:", error);
+                } else {
+                    console.log("Đã xóa các đơn hàng cũ hơn 2 ngày. Số đơn hàng còn lại:", filteredOrders.length);
+                }
             });
         } else {
             console.log("Không có đơn hàng nào quá 2 ngày để xóa.");
