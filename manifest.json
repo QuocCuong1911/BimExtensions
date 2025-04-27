@@ -39,6 +39,7 @@
     "default_title": "Open Product Manager"
   },
   "host_permissions": [
-    "https://*.firebaseio.com/"
-  ]
+        "https://*.firebaseio.com/",
+        "https://firestore.googleapis.com/"
+    ]
 }

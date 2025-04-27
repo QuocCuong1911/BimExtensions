@@ -1,19 +1,12 @@
-// Khai báo biến toàn cục để lưu sản phẩm đang chỉnh sửa
 let currentEditProduct = null;
-let currentId = 1; // Khởi tạo ID bắt đầu từ 1
-let lastSearchTerm = ''; // Lưu từ khóa tìm kiếm cuối cùng
-
-// Khởi tạo Firebase
+let currentId = 1;
+let lastSearchTerm = '';
 let db;
+
 function initializeFirebase() {
-    if (typeof firebase === 'undefined') {
-        console.error("Firebase SDK không được tải. Vui lòng kiểm tra lại file HTML và script Firebase.");
-        return;
-    }
     const firebaseConfig = {
         apiKey: "AIzaSyD8I5hLFV7E2oNl5ZVA_ZQMyNqmUTrfwlk",
         authDomain: "myextensionsync.firebaseapp.com",
-        databaseURL: "https://myextensionsync-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "myextensionsync",
         storageBucket: "myextensionsync.firebasestorage.app",
         messagingSenderId: "489073226857",
@@ -21,39 +14,34 @@ function initializeFirebase() {
         measurementId: "G-TGZLB7Y1NP"
     };
     const app = firebase.initializeApp(firebaseConfig);
-    db = firebase.database(app);
+    db = firebase.firestore(app);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Khởi tạo Firebase
     initializeFirebase();
-    // Thực hiện hành động khi HTML được tải xong
     console.log("Nội dung HTML đã được tải xong!");
-    // Tăng số lần trang mở
     incrementPageOpenCount();
-    // Hiển thị sản phẩm khi tải trang
     displayProducts();
-    // Khởi tạo dữ liệu mẫu
-    initializeSampleProducts();
+    //initializeSampleProducts();
 });
 
-// Hàm khởi tạo dữ liệu mẫu
 function initializeSampleProducts() {
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        const productList = snapshot.val();
-        if (!productList) {
-            // Nếu chưa có dữ liệu, khởi tạo dữ liệu mẫu
+    const productListRef = db.collection('productList');
+    productListRef.get().then((snapshot) => {
+        if (snapshot.empty) {
             const sampleProducts = [
                 { id: 1, maTim: "SP001", tenHienThi: "Áo thun nam", donGia: 150, hethang: false },
                 { id: 2, maTim: "SP002", tenHienThi: "Quần jeans nữ", donGia: 300, hethang: true }
             ];
-            productListRef.set(sampleProducts, (error) => {
-                if (error) {
-                    console.error("Lỗi khi lưu dữ liệu mẫu lên Firebase:", error);
-                } else {
-                    console.log("Đã khởi tạo dữ liệu mẫu trên Firebase");
-                }
+            const batch = db.batch();
+            sampleProducts.forEach(product => {
+                const docRef = productListRef.doc(product.id.toString());
+                batch.set(docRef, product);
+            });
+            batch.commit().then(() => {
+                console.log("Đã khởi tạo dữ liệu mẫu trên Firestore");
+            }).catch(error => {
+                console.error("Lỗi khi lưu dữ liệu mẫu lên Firestore:", error);
             });
         }
     });
@@ -65,7 +53,7 @@ function incrementPageOpenCount() {
     count++;
     pageOpenCountInput.value = count;
     localStorage.setItem('pageOpenCount', count);
-    console.log("Số lần mở : " + count);
+    console.log("Số lần mở: " + count);
 }
 
 document.querySelector('.home-icon').addEventListener('click', function() {
@@ -83,30 +71,37 @@ document.querySelector('.home-icon').addEventListener('click', function() {
     });
 });
 
-// Hàm hiển thị dữ liệu sản phẩm từ Firebase
 function displayProducts(searchTerm = '') {
     const table = document.getElementById("customers");
     const rows = table.getElementsByTagName("tr");
 
-    // Xóa các hàng dữ liệu (giữ lại hàng tiêu đề)
+    // Xóa các hàng cũ
     for (let i = rows.length - 1; i > 0; i--) {
         table.deleteRow(i);
     }
 
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        let productList = snapshot.val() || [];
-        let filteredProducts = productList;
+    // Hiển thị loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = loadingOverlay.querySelector('.loading-content p');
+    loadingMessage.textContent = 'Đang tải dữ liệu sản phẩm, vui lòng chờ...'; // Cập nhật thông điệp
+    loadingOverlay.style.display = 'flex';
 
-        // Nếu có từ khóa tìm kiếm, lọc sản phẩm
+    const productListRef = db.collection('productList');
+    productListRef.get().then((snapshot) => {
+        let productList = [];
+        snapshot.forEach(doc => {
+            productList.push({ ...doc.data(), docId: doc.id });
+        });
+
+        let filteredProducts = productList;
         if (searchTerm) {
             filteredProducts = searchProducts(searchTerm, productList);
         }
 
-        // Hiển thị danh sách sản phẩm (đã lọc hoặc toàn bộ)
+        filteredProducts.sort((a, b) => a.id - b.id);
         filteredProducts.forEach((product, index) => {
             const newRow = table.insertRow();
-            newRow.insertCell(0).innerText = product.id; // Hiển thị ID
+            newRow.insertCell(0).innerText = product.id;
             newRow.insertCell(1).innerText = product.maTim;
             newRow.insertCell(2).innerText = product.tenHienThi;
             newRow.insertCell(3).innerText = product.donGia;
@@ -123,52 +118,55 @@ function displayProducts(searchTerm = '') {
             statusButton.className = product.hethang ? "button-het" : "button-con";
             statusCell.appendChild(statusButton);
 
-            // Thêm sự kiện click để sửa dữ liệu
             newRow.addEventListener("click", () => {
                 document.getElementById("id-sanpham").value = product.id;
                 document.getElementById("ma-tim").value = product.maTim;
                 document.getElementById("ten-hien-thi").value = product.tenHienThi;
                 document.getElementById("don-gia").value = product.donGia;
-                currentEditProduct = { ...product, index }; // Lưu sản phẩm hiện tại để sửa
+                currentEditProduct = { ...product, index };
             });
 
-            // Xóa sản phẩm
             deleteButton.addEventListener("click", (event) => {
                 event.stopPropagation();
-                removeProduct(index);
+                removeProduct(product.docId);
                 displayProducts(lastSearchTerm);
             });
 
-            // Chuyển đổi trạng thái hết hàng
             statusButton.addEventListener("click", (event) => {
                 event.stopPropagation();
-                toggleHethang(index);
+                toggleHethang(product.docId);
             });
         });
 
-        // Cập nhật currentId cho sản phẩm tiếp theo
-        currentId = Math.max(...(productList.map(p => p.id) || [0]), 0) + 1;
+        currentId = productList.length > 0 ? Math.max(...productList.map(p => p.id)) + 1 : 1;
+
+        // Ẩn loading overlay khi hoàn tất
+        loadingOverlay.style.display = 'none';
+    }).catch(error => {
+        console.error("Lỗi khi lấy dữ liệu từ Firestore:", error);
+        // Ẩn loading overlay khi có lỗi
+        loadingOverlay.style.display = 'none';
+        alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.");
     });
 }
 
-// Hàm đảo ngược trạng thái hethang
-function toggleHethang(index) {
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        let productList = snapshot.val() || [];
-        productList[index].hethang = !productList[index].hethang;
-        productListRef.set(productList, (error) => {
-            if (error) {
-                console.error("Lỗi khi cập nhật trạng thái hethang trên Firebase:", error);
-            } else {
-                console.log("Đã cập nhật trạng thái hethang trên Firebase");
+function toggleHethang(docId) {
+    const productRef = db.collection('productList').doc(docId);
+    productRef.get().then(doc => {
+        if (doc.exists) {
+            const product = doc.data();
+            productRef.update({
+                hethang: !product.hethang
+            }).then(() => {
+                console.log("Đã cập nhật trạng thái hethang trên Firestore");
                 displayProducts(lastSearchTerm);
-            }
-        });
+            }).catch(error => {
+                console.error("Lỗi khi cập nhật trạng thái hethang trên Firestore:", error);
+            });
+        }
     });
 }
 
-// Hàm tìm kiếm sản phẩm
 function searchProducts(searchTerm, productList) {
     const keywords = searchTerm.toLowerCase().trim().split(/\s+/);
     return productList.filter(product => {
@@ -227,22 +225,21 @@ function addProduct() {
             id: currentId++,
             maTim: `${maTim}-${size}`,
             tenHienThi: `${maTim} ${tenHienThi} ${size}`,
-            donGia,
+            donGia: parseInt(donGia),
             hethang: false
         }));
 
-        const productListRef = db.ref('productList');
-        productListRef.once('value', (snapshot) => {
-            let productList = snapshot.val() || [];
-            productList.push(...newProducts);
-            productListRef.set(productList, (error) => {
-                if (error) {
-                    console.error("Lỗi khi thêm sản phẩm lên Firebase:", error);
-                } else {
-                    console.log("Đã thêm sản phẩm lên Firebase");
-                    displayProducts(lastSearchTerm);
-                }
-            });
+        const batch = db.batch();
+        newProducts.forEach(product => {
+            const docRef = db.collection('productList').doc(product.id.toString());
+            batch.set(docRef, product);
+        });
+
+        batch.commit().then(() => {
+            console.log("Đã thêm sản phẩm lên Firestore");
+            displayProducts(lastSearchTerm);
+        }).catch(error => {
+            console.error("Lỗi khi thêm sản phẩm lên Firestore:", error);
         });
 
         clearInputs();
@@ -262,70 +259,83 @@ function updateProduct() {
         return;
     }
 
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        let productList = snapshot.val() || [];
-        const index = productList.findIndex(product => product.id == id);
-
-        if (index === -1) {
+    const productRef = db.collection('productList').doc(id);
+    productRef.get().then(doc => {
+        if (!doc.exists) {
             alert("Chưa tồn tại sản phẩm với ID này.");
             return;
         }
 
-        productList[index] = {
-            ...productList[index],
+        productRef.update({
             maTim,
             tenHienThi,
-            donGia,
+            donGia: parseInt(donGia),
             id: parseInt(id)
-        };
-
-        productListRef.set(productList, (error) => {
-            if (error) {
-                console.error("Lỗi khi cập nhật sản phẩm trên Firebase:", error);
-            } else {
-                console.log("Đã cập nhật sản phẩm trên Firebase");
-                displayProducts(lastSearchTerm);
-            }
+        }).then(() => {
+            console.log("Đã cập nhật sản phẩm trên Firestore");
+            displayProducts(lastSearchTerm);
+        }).catch(error => {
+            console.error("Lỗi khi cập nhật sản phẩm trên Firestore:", error);
         });
     });
 
     clearInputs();
 }
 
-function removeProduct(index) {
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        let productList = snapshot.val() || [];
-        productList.splice(index, 1);
-        productListRef.set(productList, (error) => {
-            if (error) {
-                console.error("Lỗi khi xóa sản phẩm trên Firebase:", error);
-            } else {
-                console.log("Đã xóa sản phẩm trên Firebase");
-                displayProducts(lastSearchTerm);
-            }
-        });
+function removeProduct(docId) {
+    db.collection('productList').doc(docId).delete().then(() => {
+        console.log("Đã xóa sản phẩm trên Firestore");
+        displayProducts(lastSearchTerm);
+    }).catch(error => {
+        console.error("Lỗi khi xóa sản phẩm trên Firestore:", error);
     });
 }
 
 document.querySelector(".button-xoatoanbo").addEventListener("click", () => {
     const confirmDelete = confirm("Bạn có chắc chắn muốn xóa toàn bộ dữ liệu không?");
     if (confirmDelete) {
-        clearAllProducts();
+        clearAllProducts(confirmDelete);
     }
 });
 
-function clearAllProducts() {
-    const productListRef = db.ref('productList');
-    productListRef.set([], (error) => {
-        if (error) {
-            console.error("Lỗi khi xóa toàn bộ sản phẩm trên Firebase:", error);
-        } else {
-            console.log("Đã xóa toàn bộ sản phẩm trên Firebase");
-            displayProducts(lastSearchTerm);
-            alert("Đã xóa toàn bộ dữ liệu.");
+function clearAllProducts(confirmDelete) {
+    
+    if (!confirmDelete) return;
+
+    // Hiển thị loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = loadingOverlay.querySelector('.loading-content p');
+    loadingMessage.textContent = 'Đang xóa toàn bộ sản phẩm, vui lòng chờ...'; // Cập nhật thông điệp
+    loadingOverlay.style.display = 'flex';
+
+    const productListRef = db.collection('productList');
+    productListRef.get().then(snapshot => {
+        if (snapshot.empty) {
+            // Nếu không có sản phẩm để xóa
+            loadingOverlay.style.display = 'none';
+            alert("Không có sản phẩm nào để xóa.");
+            return;
         }
+
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        batch.commit().then(() => {
+            console.log("Đã xóa toàn bộ sản phẩm trên Firestore");
+            displayProducts(lastSearchTerm);
+            loadingOverlay.style.display = 'none';
+            alert("Đã xóa toàn bộ dữ liệu.");
+        }).catch(error => {
+            console.error("Lỗi khi xóa toàn bộ sản phẩm trên Firestore:", error);
+            loadingOverlay.style.display = 'none';
+            alert("Có lỗi xảy ra khi xóa dữ liệu. Vui lòng thử lại.");
+        });
+    }).catch(error => {
+        console.error("Lỗi khi truy vấn productList trên Firestore:", error);
+        loadingOverlay.style.display = 'none';
+        alert("Có lỗi xảy ra khi truy vấn dữ liệu. Vui lòng thử lại.");
     });
 }
 
@@ -339,7 +349,6 @@ function clearInputs() {
 document.querySelector(".button-them").addEventListener("click", addProduct);
 document.querySelector(".button-sua").addEventListener("click", updateProduct);
 
-// Excel
 document.querySelector('.button-nhapex').addEventListener('click', () => {
     document.getElementById('file-input').click();
 });
@@ -351,35 +360,58 @@ document.getElementById('file-input').addEventListener('change', (event) => {
         return;
     }
 
+    // Hiển thị loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = loadingOverlay.querySelector('.loading-content p');
+    loadingMessage.textContent = 'Đang tải sản phẩm lên, vui lòng chờ...';
+    loadingOverlay.style.display = 'flex';
+
     const reader = new FileReader();
     reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        const productListRef = db.ref('productList');
-        productListRef.once('value', (snapshot) => {
-            let productList = snapshot.val() || [];
-
-            const newProducts = jsonData.slice(1).map(row => ({
-                id: currentId++,
-                maTim: row[0] ? row[0].toUpperCase() : '',
-                tenHienThi: row[1],
-                donGia: row[2],
-                hethang: row[3] === "Hết" || row[3] === true
-            })).filter(product => product.maTim && product.tenHienThi && product.donGia);
-
-            productList.push(...newProducts);
-            productListRef.set(productList, (error) => {
-                if (error) {
-                    console.error("Lỗi khi nhập sản phẩm từ Excel lên Firebase:", error);
-                } else {
-                    console.log("Đã nhập sản phẩm từ Excel lên Firebase");
-                    displayProducts(lastSearchTerm);
+            const batch = db.batch();
+            jsonData.slice(1).forEach(row => {
+                const product = {
+                    id: currentId++,
+                    maTim: row[0] ? row[0].toUpperCase() : '',
+                    tenHienThi: row[1],
+                    donGia: row[2],
+                    hethang: row[3] === "Hết" || row[3] === true
+                };
+                if (product.maTim && product.tenHienThi && product.donGia) {
+                    const docRef = db.collection('productList').doc(product.id.toString());
+                    batch.set(docRef, product);
                 }
             });
-        });
+
+            batch.commit().then(() => {
+                console.log("Đã nhập sản phẩm từ Excel lên Firestore");
+                displayProducts(lastSearchTerm);
+                // Ẩn loading overlay khi hoàn tất
+                loadingOverlay.style.display = 'none';
+            }).catch(error => {
+                console.error("Lỗi khi nhập sản phẩm từ Excel lên Firestore:", error);
+                // Ẩn loading overlay khi có lỗi
+                loadingOverlay.style.display = 'none';
+                alert('Có lỗi xảy ra khi nhập dữ liệu. Vui lòng thử lại.');
+            });
+        } catch (error) {
+            console.error("Lỗi khi đọc file Excel:", error);
+            // Ẩn loading overlay khi có lỗi đọc file
+            loadingOverlay.style.display = 'none';
+            alert('Có lỗi xảy ra khi đọc file Excel. Vui lòng kiểm tra file và thử lại.');
+        }
+    };
+    reader.onerror = (error) => {
+        console.error("Lỗi khi đọc file:", error);
+        // Ẩn loading overlay khi có lỗi đọc file
+        loadingOverlay.style.display = 'none';
+        alert('Không thể đọc file. Vui lòng thử lại.');
     };
     reader.readAsArrayBuffer(file);
 });
@@ -387,9 +419,13 @@ document.getElementById('file-input').addEventListener('change', (event) => {
 document.querySelector('.button-taiex').addEventListener('click', downloadExcelFile);
 
 function downloadExcelFile() {
-    const productListRef = db.ref('productList');
-    productListRef.once('value', (snapshot) => {
-        const productList = snapshot.val() || [];
+    const productListRef = db.collection('productList');
+    productListRef.get().then(snapshot => {
+        const productList = [];
+        snapshot.forEach(doc => {
+            productList.push(doc.data());
+        });
+
         const excelData = [["Mã tìm", "Tên hiển thị", "Giá", "Trạng Thái"]];
         productList.forEach(product => {
             excelData.push([product.maTim, product.tenHienThi, product.donGia, product.hethang ? "Hết" : "Còn"]);

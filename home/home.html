@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Product Management</title>
     <script src="/lib/firebase-app-compat.js"></script>
-    <script src="/lib/firebase-database-compat.js"></script>
+    <script src="/lib/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -13,6 +13,12 @@
 </head>
 
 <body>
+    <div id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <img src="/loading.gif" alt="Loading..." width="50">
+            <p>Đang nhập dữ liệu, vui lòng chờ...</p>
+        </div>
+    </div>
     <input type="hidden" id="pageOpenCount" value="0">
     <div class="header">
         <div class="home-icon">
