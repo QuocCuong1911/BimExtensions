@@ -492,6 +492,7 @@ function cleanOldOrders() {
         const now = new Date();
         const batch = db.batch();
         let deletedCount = 0;
+
         snapshot.forEach(doc => {
             const order = doc.data();
             if (!order.orderTime) {
@@ -499,22 +500,36 @@ function cleanOldOrders() {
                 deletedCount++;
                 return;
             }
+
             const orderDate = new Date(order.orderTime);
             const diffInMs = now - orderDate;
             const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-            if (diffInDays > 2) {
+
+            // Xác định số ngày cần giữ dựa trên số lượng sản phẩm
+            const productCount = order.products ? order.products.length : 0;
+            let daysToKeep = 2; // Mặc định cho ít hơn 5 sản phẩm
+
+            if (productCount >= 7) {
+                daysToKeep = 10;
+            } else if (productCount >= 5) {
+                daysToKeep = 5;
+            }
+
+            // Kiểm tra và xóa đơn hàng nếu vượt quá số ngày cần giữ
+            if (diffInDays > daysToKeep) {
                 batch.delete(doc.ref);
                 deletedCount++;
             }
         });
+
         if (deletedCount > 0) {
             batch.commit().then(() => {
-                console.log(`Đã xóa ${deletedCount} đơn hàng cũ hơn 2 ngày.`);
+                console.log(`Đã xóa ${deletedCount} đơn hàng cũ.`);
             }).catch(error => {
                 console.error("Lỗi khi xóa đơn hàng cũ trên Firestore:", error);
             });
         } else {
-            console.log("Không có đơn hàng nào quá 2 ngày để xóa.");
+            console.log("Không có đơn hàng nào cần xóa.");
         }
     }).catch(error => {
         console.error("Lỗi khi truy vấn orderHistory trên Firestore:", error);
