@@ -48,6 +48,20 @@ document.querySelector('.home-icon').addEventListener('click', function() {
     });
 });
 
+// Hàm cập nhật lastModified trong metadata/productList
+function updateLastModified() {
+    const metadataRef = db.collection('metadata').doc('productList');
+    const currentTime = new Date().toISOString();
+    
+    return metadataRef.set({
+        lastModified: currentTime
+    }, { merge: true }).then(() => {
+        console.log(`Đã cập nhật lastModified: ${currentTime}`);
+    }).catch(error => {
+        console.error("Lỗi khi cập nhật lastModified:", error);
+    });
+}
+
 function displayProducts(searchTerm = '') {
     const table = document.getElementById("customers");
     const rows = table.getElementsByTagName("tr");
@@ -144,6 +158,9 @@ function toggleHethang(docId) {
                 hethang: !product.hethang
             }).then(() => {
                 console.log("Đã cập nhật trạng thái hethang trên Firestore");
+                // Cập nhật lastModified sau khi thay đổi
+                return updateLastModified();
+            }).then(() => {
                 displayProducts(lastSearchTerm); // Gọi lại để cập nhật giao diện
             }).catch(error => {
                 console.error("Lỗi khi cập nhật trạng thái hethang trên Firestore:", error);
@@ -224,6 +241,9 @@ function addProduct() {
 
         batch.commit().then(() => {
             console.log("Đã thêm sản phẩm lên Firestore");
+            // Cập nhật lastModified sau khi thêm sản phẩm
+            return updateLastModified();
+        }).then(() => {
             displayProducts(lastSearchTerm);
         }).catch(error => {
             console.error("Lỗi khi thêm sản phẩm lên Firestore:", error);
@@ -260,6 +280,9 @@ function updateProduct() {
             id: parseInt(id)
         }).then(() => {
             console.log("Đã cập nhật sản phẩm trên Firestore");
+            // Cập nhật lastModified sau khi sửa sản phẩm
+            return updateLastModified();
+        }).then(() => {
             displayProducts(lastSearchTerm);
         }).catch(error => {
             console.error("Lỗi khi cập nhật sản phẩm trên Firestore:", error);
@@ -272,6 +295,9 @@ function updateProduct() {
 function removeProduct(docId) {
     db.collection('productList').doc(docId).delete().then(() => {
         console.log("Đã xóa sản phẩm trên Firestore");
+        // Cập nhật lastModified sau khi xóa sản phẩm
+        return updateLastModified();
+    }).then(() => {
         displayProducts(lastSearchTerm);
     }).catch(error => {
         console.error("Lỗi khi xóa sản phẩm trên Firestore:", error);
@@ -308,6 +334,9 @@ function clearAllProducts(confirmDelete) {
 
         batch.commit().then(() => {
             console.log("Đã xóa toàn bộ sản phẩm trên Firestore");
+            // Cập nhật lastModified sau khi xóa toàn bộ
+            return updateLastModified();
+        }).then(() => {
             displayProducts(lastSearchTerm);
             loadingOverlay.style.display = 'none';
             alert("Đã xóa toàn bộ dữ liệu.");
@@ -374,6 +403,9 @@ document.getElementById('file-input').addEventListener('change', (event) => {
 
             batch.commit().then(() => {
                 console.log("Đã nhập sản phẩm từ Excel lên Firestore");
+                // Cập nhật lastModified sau khi nhập từ Excel
+                return updateLastModified();
+            }).then(() => {
                 displayProducts(lastSearchTerm);
                 loadingOverlay.style.display = 'none';
             }).catch(error => {
@@ -434,7 +466,15 @@ function downloadExcelFile() {
     });
 }
 
-document.querySelector('input[name="search"]').addEventListener('input', function (event) {
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+document.querySelector('input[name="search"]').addEventListener('input', debounce(function (event) {
     lastSearchTerm = event.target.value.toLowerCase();
     displayProducts(lastSearchTerm);
-});
+}, 400));

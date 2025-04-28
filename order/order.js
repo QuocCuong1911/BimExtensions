@@ -20,16 +20,70 @@ function initializeFirebase() {
     db = firebase.firestore(app);
 }
 
+// Hàm cập nhật lastModified trong metadata/productList
+function updateLastModified() {
+    const metadataRef = db.collection('metadata').doc('productList');
+    const currentTime = new Date().toISOString();
+    
+    return metadataRef.set({
+        lastModified: currentTime
+    }, { merge: true }).then(() => {
+        console.log(`Đã cập nhật lastModified: ${currentTime}`);
+    }).catch(error => {
+        console.error("Lỗi khi cập nhật lastModified:", error);
+    });
+}
+
 function loadProductList() {
-    const productListRef = db.collection('productList');
-    productListRef.onSnapshot((snapshot) => {
-        productList = [];
-        snapshot.forEach(doc => {
-            productList.push({ ...doc.data(), docId: doc.id });
-        });
-        productList.sort((a, b) => a.id - b.id);
-    }, error => {
-        console.error("Lỗi khi tải productList từ Firestore:", error);
+    // Hiển thị loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = loadingOverlay.querySelector('.loading-content p');
+    loadingMessage.textContent = 'Đang kiểm tra dữ liệu sản phẩm, vui lòng chờ...';
+    loadingOverlay.style.display = 'flex';
+
+    // Lấy lastModified từ localStorage
+    const storedData = JSON.parse(localStorage.getItem('productList')) || { data: [], lastModified: null };
+    const localLastModified = storedData.lastModified;
+
+    // Lấy lastModified từ Firestore
+    const metadataRef = db.collection('metadata').doc('productList');
+    metadataRef.get().then(doc => {
+        const firestoreLastModified = doc.exists ? doc.data().lastModified : null;
+
+        // Kiểm tra thay đổi
+        if (localLastModified && firestoreLastModified && localLastModified === firestoreLastModified) {
+            // Không có thay đổi: sử dụng dữ liệu từ localStorage
+            productList = storedData.data;
+            productList.sort((a, b) => a.id - b.id);
+            loadingOverlay.style.display = 'none';
+        } else {
+            // Có thay đổi (hoặc localStorage rỗng): lấy dữ liệu mới từ Firestore
+            loadingMessage.textContent = 'Đang cập nhật dữ liệu sản phẩm, vui lòng chờ...';
+            const productListRef = db.collection('productList');
+            productListRef.get().then(snapshot => {
+                productList = [];
+                snapshot.forEach(doc => {
+                    productList.push({ ...doc.data(), docId: doc.id });
+                });
+                productList.sort((a, b) => a.id - b.id);
+
+                // Lưu dữ liệu mới và lastModified vào localStorage
+                localStorage.setItem('productList', JSON.stringify({
+                    data: productList,
+                    lastModified: firestoreLastModified || new Date().toISOString()
+                }));
+
+                loadingOverlay.style.display = 'none';
+            }).catch(error => {
+                console.error("Lỗi khi tải productList từ Firestore:", error);
+                loadingOverlay.style.display = 'none';
+                showtoastnew("Lỗi khi tải dữ liệu sản phẩm!", "error");
+            });
+        }
+    }).catch(error => {
+        console.error("Lỗi khi lấy lastModified từ Firestore:", error);
+        loadingOverlay.style.display = 'none';
+        showtoastnew("Lỗi khi kiểm tra dữ liệu!", "error");
     });
 }
 
@@ -106,6 +160,18 @@ function toggleHethang(productName, liElement) {
         const productRef = db.collection('productList').doc(product.docId);
         productRef.update({ hethang: newHethangStatus }).then(() => {
             console.log(`Đã cập nhật trạng thái hethang cho sản phẩm ${productName}`);
+            // Cập nhật lastModified sau khi thay đổi
+            return updateLastModified();
+        }).then(() => {
+            // Cập nhật productList trong localStorage
+            product.hethang = newHethangStatus;
+            const storedData = JSON.parse(localStorage.getItem('productList'));
+            if (storedData) {
+                localStorage.setItem('productList', JSON.stringify({
+                    data: productList,
+                    lastModified: storedData.lastModified
+                }));
+            }
             updateAllProductStatuses(productName, newHethangStatus);
         }).catch(error => {
             console.error("Lỗi khi cập nhật hethang trên Firestore:", error);
