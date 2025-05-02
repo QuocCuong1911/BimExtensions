@@ -446,13 +446,17 @@ function saveOrderToStorage(products) {
     const sdtInput = document.getElementById("customer-sdt");
     if (!sdtInput) {
         console.error("Không tìm thấy ô nhập SDT!");
+        showtoastnew("Lỗi: Không tìm thấy ô nhập SDT!", "error");
         return;
     }
+
     const sdt = sdtInput.value.trim();
     if (!sdt) {
         console.log("Chưa nhập SDT, không lưu đơn hàng vào Firestore");
+        showtoastnew("Vui lòng nhập số điện thoại!", "warning");
         return;
     }
+
     const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
     const discount = parseFloat(document.getElementById("discount-item").value) || 0;
     const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
@@ -468,13 +472,39 @@ function saveOrderToStorage(products) {
         shipFee: shipFee,
         orderTime: new Date().toISOString()
     };
-    const orderHistoryRef = db.collection('orderHistory').doc();
-    orderHistoryRef.set(newOrder).then(() => {
-        console.log("Đã lưu đơn hàng vào Firestore:", newOrder);
-    }).catch(error => {
-        console.error("Lỗi khi lưu đơn hàng vào Firestore:", error);
-        showtoastnew("Lỗi khi lưu đơn hàng!", "error");
-    });
+
+    const orderHistoryRef = db.collection('orderHistory');
+    orderHistoryRef.where('sdt', '==', sdt).limit(1).get()
+        .then((snapshot) => {
+            if (!snapshot.empty) {
+                // SDT đã tồn tại, cập nhật đơn hàng hiện có
+                const doc = snapshot.docs[0];
+                orderHistoryRef.doc(doc.id).set(newOrder, { merge: true })
+                    .then(() => {
+                        console.log(`Đã cập nhật đơn hàng cho SDT ${sdt}:`, newOrder);
+                        showtoastnew(`Cập nhật đơn hàng thành công cho SDT ${sdt}`, "success");
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi cập nhật đơn hàng:", error);
+                        showtoastnew("Lỗi khi cập nhật đơn hàng!", "error");
+                    });
+            } else {
+                // SDT chưa tồn tại, thêm đơn hàng mới
+                orderHistoryRef.doc().set(newOrder)
+                    .then(() => {
+                        console.log(`Đã lưu đơn hàng mới cho SDT ${sdt}:`, newOrder);
+                        showtoastnew(`Lưu đơn hàng mới thành công cho SDT ${sdt}`, "success");
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi lưu đơn hàng mới:", error);
+                        showtoastnew("Lỗi khi lưu đơn hàng mới!", "error");
+                    });
+            }
+        })
+        .catch(error => {
+            console.error("Lỗi khi kiểm tra SDT:", error);
+            showtoastnew("Lỗi khi kiểm tra số điện thoại!", "error");
+        });
 }
 
 document.getElementById("customer-sdt").addEventListener("input", function () {
