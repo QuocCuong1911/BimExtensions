@@ -36,7 +36,7 @@ chrome.action.onClicked.addListener(() => {
 // Lắng nghe sự kiện khi sử dụng phím tắt
 chrome.commands.onCommand.addListener((command) => {
   if (command === "open_order_window") {
-    createWindow("order/order.html", 700, 800);
+    createWindow("order/order.html", 700, 820);
   }
 });
 

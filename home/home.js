@@ -35,7 +35,7 @@ function incrementPageOpenCount() {
 
 document.querySelector('.home-icon').addEventListener('click', function() {
     const homeWidth = 700;
-    const homeHeight = 800;
+    const homeHeight = 820;
     chrome.windows.create({
         url: chrome.runtime.getURL("order/order.html"),
         type: "popup",

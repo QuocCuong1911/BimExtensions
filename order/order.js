@@ -31,12 +31,11 @@ function setupMetadataListener() {
         const localLastModified = storedData.lastModified;
 
         const notificationDot = document.querySelector('.notification-dot');
-        if (firestoreLastModified && localLastModified !== firestoreLastModified) {
-            // Dữ liệu đã thay đổi, hiển thị notification-dot
+        // Chỉ hiển thị thông báo nếu không phải người đang thực hiện thay đổi
+        if (!isUpdating && firestoreLastModified && localLastModified !== firestoreLastModified) {
             notificationDot.classList.add('visible');
             showtoastnew("Dữ liệu sản phẩm đã được cập nhật. Nhấn nút tải để làm mới!", "info");
         } else {
-            // Không có thay đổi, ẩn notification-dot
             notificationDot.classList.remove('visible');
         }
     }, error => {
@@ -191,7 +190,12 @@ function updateAllProductStatuses(productName, newHethangStatus) {
     });
 }
 
+let isUpdating = false; // Cờ để đánh dấu người dùng đang thực hiện thay đổi
+
 function toggleHethang(productName, liElement) {
+    if (isUpdating) return; // Ngăn cập nhật đồng thời
+    isUpdating = true;
+
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = loadingOverlay.querySelector('.loading-content p');
     loadingMessage.textContent = 'Đang cập nhật trạng thái sản phẩm, vui lòng chờ...';
@@ -201,27 +205,32 @@ function toggleHethang(productName, liElement) {
     if (product) {
         const newHethangStatus = !product.hethang;
         const productRef = db.collection('productList').doc(product.docId);
-        const currentTime = new Date().toISOString(); // Thời gian mới
         productRef.update({ hethang: newHethangStatus }).then(() => {
             console.log(`Đã cập nhật trạng thái hethang cho sản phẩm ${productName}`);
             return updateLastModified();
         }).then(() => {
+            return db.collection('metadata').doc('productList').get();
+        }).then(doc => {
+            const newLastModified = doc.exists ? doc.data().lastModified : new Date().toISOString();
             product.hethang = newHethangStatus;
-            const storedData = JSON.parse(localStorage.getItem('productList')) || { data: [], lastModified: null };
             localStorage.setItem('productList', JSON.stringify({
                 data: productList,
-                lastModified: currentTime // Đồng bộ lastModified mới
+                lastModified: newLastModified
             }));
             updateAllProductStatuses(productName, newHethangStatus);
             loadingOverlay.style.display = 'none';
+            showtoastnew(`Đã cập nhật trạng thái ${newHethangStatus ? 'hết hàng' : 'còn hàng'} cho ${productName}`, "success");
+            isUpdating = false; // Đặt cờ về false sau khi hoàn tất
         }).catch(error => {
             console.error("Lỗi khi cập nhật hethang trên Firestore:", error);
             loadingOverlay.style.display = 'none';
             showtoastnew("Lỗi khi cập nhật trạng thái sản phẩm!", "error");
+            isUpdating = false; // Đặt cờ về false nếu có lỗi
         });
     } else {
         loadingOverlay.style.display = 'none';
         showtoastnew(`Sản phẩm "${productName}" không tồn tại!`, "warning");
+        isUpdating = false;
     }
 }
 
