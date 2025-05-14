@@ -18,6 +18,31 @@ function initializeFirebase() {
     };
     const app = firebase.initializeApp(firebaseConfig);
     db = firebase.firestore(app);
+    // Thiết lập onSnapshot cho metadata/productList
+    setupMetadataListener();
+}
+
+// Hàm thiết lập onSnapshot cho metadata/productList
+function setupMetadataListener() {
+    const metadataRef = db.collection('metadata').doc('productList');
+    unsubscribeMetadata = metadataRef.onSnapshot(doc => {
+        const firestoreLastModified = doc.exists ? doc.data().lastModified : null;
+        const storedData = JSON.parse(localStorage.getItem('productList')) || { data: [], lastModified: null };
+        const localLastModified = storedData.lastModified;
+
+        const notificationDot = document.querySelector('.notification-dot');
+        if (firestoreLastModified && localLastModified !== firestoreLastModified) {
+            // Dữ liệu đã thay đổi, hiển thị notification-dot
+            notificationDot.classList.add('visible');
+            showtoastnew("Dữ liệu sản phẩm đã được cập nhật. Nhấn nút tải để làm mới!", "info");
+        } else {
+            // Không có thay đổi, ẩn notification-dot
+            notificationDot.classList.remove('visible');
+        }
+    }, error => {
+        console.error("Lỗi khi lắng nghe metadata từ Firestore:", error);
+        showtoastnew("Lỗi khi kiểm tra cập nhật dữ liệu!", "error");
+    });
 }
 
 // Hàm cập nhật lastModified trong metadata/productList
@@ -35,29 +60,24 @@ function updateLastModified() {
 }
 
 function loadProductList() {
-    // Hiển thị loading overlay
     const loadingOverlay = document.getElementById('loading-overlay');
     const loadingMessage = loadingOverlay.querySelector('.loading-content p');
     loadingMessage.textContent = 'Đang kiểm tra dữ liệu sản phẩm, vui lòng chờ...';
     loadingOverlay.style.display = 'flex';
 
-    // Lấy lastModified từ localStorage
     const storedData = JSON.parse(localStorage.getItem('productList')) || { data: [], lastModified: null };
     const localLastModified = storedData.lastModified;
 
-    // Lấy lastModified từ Firestore
     const metadataRef = db.collection('metadata').doc('productList');
     metadataRef.get().then(doc => {
         const firestoreLastModified = doc.exists ? doc.data().lastModified : null;
 
-        // Kiểm tra thay đổi
         if (localLastModified && firestoreLastModified && localLastModified === firestoreLastModified) {
-            // Không có thay đổi: sử dụng dữ liệu từ localStorage
             productList = storedData.data;
             productList.sort((a, b) => a.id - b.id);
             loadingOverlay.style.display = 'none';
+            document.querySelector('.notification-dot').classList.remove('visible'); // Ẩn notification-dot
         } else {
-            // Có thay đổi (hoặc localStorage rỗng): lấy dữ liệu mới từ Firestore
             loadingMessage.textContent = 'Đang cập nhật dữ liệu sản phẩm, vui lòng chờ...';
             const productListRef = db.collection('productList');
             productListRef.get().then(snapshot => {
@@ -67,13 +87,13 @@ function loadProductList() {
                 });
                 productList.sort((a, b) => a.id - b.id);
 
-                // Lưu dữ liệu mới và lastModified vào localStorage
                 localStorage.setItem('productList', JSON.stringify({
                     data: productList,
                     lastModified: firestoreLastModified || new Date().toISOString()
                 }));
 
                 loadingOverlay.style.display = 'none';
+                document.querySelector('.notification-dot').classList.remove('visible'); // Ẩn notification-dot
             }).catch(error => {
                 console.error("Lỗi khi tải productList từ Firestore:", error);
                 loadingOverlay.style.display = 'none';
@@ -110,6 +130,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     console.log("Nội dung HTML đã được tải xong!");
     incrementPageOpenCount();
+
+    // Thêm sự kiện cho download-button
+    document.querySelector('.download-button').addEventListener('click', () => {
+        const notificationDot = document.querySelector('.notification-dot');
+        if (notificationDot.classList.contains('visible')) {
+            loadProductList(); // Gọi lại để tải dữ liệu mới
+        } else {
+            showtoastnew("Dữ liệu đã là mới nhất!", "info");
+        }
+    });
+});
+
+// Hủy onSnapshot khi rời trang
+window.addEventListener('unload', () => {
+    if (unsubscribeMetadata) {
+        unsubscribeMetadata();
+        console.log("Đã hủy onSnapshot cho metadata/productList");
+    }
 });
 
 function incrementPageOpenCount() {
@@ -154,28 +192,36 @@ function updateAllProductStatuses(productName, newHethangStatus) {
 }
 
 function toggleHethang(productName, liElement) {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingMessage = loadingOverlay.querySelector('.loading-content p');
+    loadingMessage.textContent = 'Đang cập nhật trạng thái sản phẩm, vui lòng chờ...';
+    loadingOverlay.style.display = 'flex';
+
     const product = productList.find(p => p.tenHienThi === productName);
     if (product) {
         const newHethangStatus = !product.hethang;
         const productRef = db.collection('productList').doc(product.docId);
+        const currentTime = new Date().toISOString(); // Thời gian mới
         productRef.update({ hethang: newHethangStatus }).then(() => {
             console.log(`Đã cập nhật trạng thái hethang cho sản phẩm ${productName}`);
-            // Cập nhật lastModified sau khi thay đổi
             return updateLastModified();
         }).then(() => {
-            // Cập nhật productList trong localStorage
             product.hethang = newHethangStatus;
-            const storedData = JSON.parse(localStorage.getItem('productList'));
-            if (storedData) {
-                localStorage.setItem('productList', JSON.stringify({
-                    data: productList,
-                    lastModified: storedData.lastModified
-                }));
-            }
+            const storedData = JSON.parse(localStorage.getItem('productList')) || { data: [], lastModified: null };
+            localStorage.setItem('productList', JSON.stringify({
+                data: productList,
+                lastModified: currentTime // Đồng bộ lastModified mới
+            }));
             updateAllProductStatuses(productName, newHethangStatus);
+            loadingOverlay.style.display = 'none';
         }).catch(error => {
             console.error("Lỗi khi cập nhật hethang trên Firestore:", error);
+            loadingOverlay.style.display = 'none';
+            showtoastnew("Lỗi khi cập nhật trạng thái sản phẩm!", "error");
         });
+    } else {
+        loadingOverlay.style.display = 'none';
+        showtoastnew(`Sản phẩm "${productName}" không tồn tại!`, "warning");
     }
 }
 
@@ -207,19 +253,19 @@ document.querySelector('.add-button').addEventListener('click', function () {
             toggleHethang(productName, newProduct);
         }
     });
-    newProduct.querySelector('.product-name').addEventListener('input', function () {
-        const productName = this.value.trim();
-        if (productName) {
-            const product = productList.find(p => p.tenHienThi === productName);
-            if (product) {
-                const statusIcon = newProduct.querySelector('.status-icon');
-                const iconElement = statusIcon.querySelector('i');
-                iconElement.classList.remove('fa-circle-check', 'fa-exclamation-circle');
-                iconElement.classList.add(product.hethang ? 'fa-exclamation-circle' : 'fa-circle-check');
-                newProduct.querySelector('.product-name').classList.toggle('out-of-stock', product.hethang);
-            }
-        }
-    });
+    // newProduct.querySelector('.product-name').addEventListener('input', function () {
+    //     const productName = this.value.trim();
+    //     if (productName) {
+    //         const product = productList.find(p => p.tenHienThi === productName);
+    //         if (product) {
+    //             const statusIcon = newProduct.querySelector('.status-icon');
+    //             const iconElement = statusIcon.querySelector('i');
+    //             iconElement.classList.remove('fa-circle-check', 'fa-exclamation-circle');
+    //             iconElement.classList.add(product.hethang ? 'fa-exclamation-circle' : 'fa-circle-check');
+    //             newProduct.querySelector('.product-name').classList.toggle('out-of-stock', product.hethang);
+    //         }
+    //     }
+    // });
     updateTotals();
 });
 

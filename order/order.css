@@ -716,3 +716,61 @@ body {
     font-size: 16px;
     color: #333;
   }
+
+  .download-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 100px;
+    padding: 10px 10px;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    border: solid 1px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-decoration: none;
+}
+
+.download-button:hover {
+    background: #91ff00;
+}
+
+.download-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 0px;
+    fill: rgb(0, 0, 0);
+}
+
+.notification-dot {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+    display: none; /* Ẩn mặc định */
+}
+
+.notification-dot.visible {
+    display: block; /* Hiển thị khi có class visible */
+    animation: ripple 1.5s infinite;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(2);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
