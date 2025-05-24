@@ -463,7 +463,7 @@ document.querySelector('.create-btn').addEventListener('click', function () {
     const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
     const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
     const discount = parseFloat(document.getElementById("discount-item").value) || 0;
-    let hasNonZeroPrice = false; // Kiểm tra xem có sản phẩm nào có giá khác 0 không
+    let hasNonZeroPrice = false;
 
     products.forEach((product) => {
         const name = product.querySelector('.product-name').value;
@@ -473,7 +473,7 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         const productTotal = price * quantity;
         totalAmount += productTotal;
         if (price > 0) {
-            hasNonZeroPrice = true; // Đánh dấu có sản phẩm có giá khác 0
+            hasNonZeroPrice = true;
             if (quantity > 1) {
                 productText += `${name} ${price} ${quantity} cái\n`;
                 totalExpression += `${price}+`.repeat(quantity);
@@ -486,37 +486,33 @@ document.querySelector('.create-btn').addEventListener('click', function () {
         }
     });
 
-    // Chỉ lấy phần đầu tiên của totalExpression nếu không có giá trị khác 0
-    totalExpression = totalExpression.slice(0, -1); // Loại bỏ dấu + cuối cùng
+    totalExpression = totalExpression.slice(0, -1);
     if (shipFee > 0 && hasNonZeroPrice) totalExpression += `+${shipFee}ship`;
-    else if (shipFee > 0 && !hasNonZeroPrice) totalExpression += `${shipFee}ship`; // Không thêm + nếu tất cả giá là 0
+    else if (shipFee > 0 && !hasNonZeroPrice) totalExpression += `${shipFee}ship`;
     if (voucher > 0) totalExpression += `-${voucher}(voucher)`;
     if (discount > 0) totalExpression += `-${discount}( )`;
     
-    // Tính tổng ban đầu
     let finalTotal = totalAmount + shipFee - voucher - discount;
     finalTotal = Math.max(finalTotal, 0);
 
-    // Kiểm tra checkbox "CK" và đặt finalTotal về 0 nếu được chọn
     const isTransferChecked = document.getElementById("check-24").checked;
     if (isTransferChecked) {
-        finalTotal = 0; // Đảm bảo tổng tiền là 0 khi chuyển khoản
+        finalTotal = 0;
     }
 
     let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
 
-    // Điều chỉnh cách hiển thị TC dựa trên điều kiện
-    if (isTransferChecked && products.length === 1 && products[0].querySelector('.quantity').value === "1" && shipFee === 0 && voucher === 0 && discount === 0) {
-        finalText += `TC : 0K`; // Trường hợp đặc biệt: 1 sản phẩm, số lượng 1, miễn ship, CK
-    } else if (isTransferChecked && finalTotal === 0) {
-        finalText += `TC : 0K`; // Khi CK được chọn và tổng là 0, chỉ hiển thị 0K
-    } else if (products.length === 1 && shipFee === 0 && voucher === 0 && discount === 0) {
+    // Điều chỉnh cách hiển thị TC
+    if (isTransferChecked && products.length === 1 && products[0].querySelector('.quantity').value === "1" && shipFee === 0 && voucher === 0 && discount === 0 && !hasNonZeroPrice) {
+        finalText += `TC : 0K`; // Trường hợp 1 sản phẩm, số lượng 1, tất cả giá = 0
+    } else if (isTransferChecked && finalTotal === 0 && !hasNonZeroPrice) {
+        finalText += `TC : 0K`; // Trường hợp CK và tổng = 0, không có giá trị nào khác 0
+    } else if (products.length === 1 && shipFee === 0 && voucher === 0 && discount === 0 && !isTransferChecked) {
         finalText += `TC : ${totalAmount}K`; // Trường hợp 1 sản phẩm, không CK
     } else {
-        finalText += `TC : ${totalExpression} = ${finalTotal}K`; // Trường hợp khác
+        finalText += `TC : ${totalExpression} = ${finalTotal}K`; // Hiển thị công thức nếu có giá trị khác 0
     }
 
-    // Thêm "CHUYỂN KHOẢN" hoặc "CHUYỂN KHOẢN, miễn ship" nếu checkbox được chọn
     if (isTransferChecked) {
         if (shipFee === 0) {
             finalText += " (CHUYỂN KHOẢN, miễn ship)";
