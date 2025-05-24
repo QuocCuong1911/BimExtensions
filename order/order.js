@@ -555,6 +555,8 @@ function saveOrderToStorage(products) {
     const voucher = parseFloat(document.getElementById("voucher-item").value) || 0;
     const discount = parseFloat(document.getElementById("discount-item").value) || 0;
     const shipFee = parseFloat(document.querySelector("input[name='phi-ship']:checked").value) || 0;
+    const isTransfer = document.getElementById("check-24").checked; // Lấy trạng thái checkbox "CK"
+
     const newOrder = {
         sdt: sdt,
         products: Array.from(products).map(product => ({
@@ -565,6 +567,7 @@ function saveOrderToStorage(products) {
         voucher: voucher,
         discount: discount,
         shipFee: shipFee,
+        isTransfer: isTransfer, // Thêm trường isTransfer
         orderTime: new Date().toISOString()
     };
 
@@ -674,6 +677,11 @@ function loadOrder(order) {
             option.checked = true;
         }
     });
+    // Tự động chọn checkbox "CK" nếu đơn hàng có isTransfer = true
+    const checkBox = document.getElementById("check-24");
+    if (checkBox) {
+        checkBox.checked = order.isTransfer || false;
+    }
     updateTotals();
 }
 
