@@ -402,16 +402,22 @@ function updateTotals() {
     totalPrice -= voucherValue;
     totalPrice -= discountValue;
     totalPrice += shippingFee;
-    totalPrice = Math.max(totalPrice, 0);
 
-    // Kiểm tra trạng thái checkbox "CK"
     const isTransferChecked = document.getElementById("check-24").checked;
+    // Đặt totalPrice về 0 nếu checkbox "CK" được chọn
     if (isTransferChecked) {
-        totalPrice = 0; // Đặt tổng tiền về 0 khi checkbox "CK" được chọn
+        totalPrice = 0;
+    }
+
+    const totalPriceInput = document.getElementById("total-price-item");
+    totalPriceInput.value = totalPrice.toFixed(0) + 'K';
+    if (totalPrice < 0) {
+        totalPriceInput.style.color = 'red';
+    } else {
+        totalPriceInput.style.color = '#109a17'; // Màu mặc định khi >= 0
     }
 
     document.getElementById("total-product-item").value = totalQuantity;
-    document.getElementById("total-price-item").value = totalPrice.toFixed(0) + 'K';
 }
 
 document.getElementById("voucher-item").addEventListener("input", updateTotals);
@@ -493,7 +499,6 @@ document.querySelector('.create-btn').addEventListener('click', function () {
     if (discount > 0) totalExpression += `-${discount}( )`;
     
     let finalTotal = totalAmount + shipFee - voucher - discount;
-    finalTotal = Math.max(finalTotal, 0);
 
     const isTransferChecked = document.getElementById("check-24").checked;
     if (isTransferChecked) {
@@ -502,15 +507,15 @@ document.querySelector('.create-btn').addEventListener('click', function () {
 
     let finalText = `Dạ em lên đơn cho mình ạ\n${productText}`;
 
-    // Điều chỉnh cách hiển thị TC
     if (isTransferChecked && products.length === 1 && products[0].querySelector('.quantity').value === "1" && shipFee === 0 && voucher === 0 && discount === 0 && !hasNonZeroPrice) {
-        finalText += `TC : 0K`; // Trường hợp 1 sản phẩm, số lượng 1, tất cả giá = 0
+        finalText += `TC : 0K`;
     } else if (isTransferChecked && finalTotal === 0 && !hasNonZeroPrice) {
-        finalText += `TC : 0K`; // Trường hợp CK và tổng = 0, không có giá trị nào khác 0
+        finalText += `TC : 0K`;
     } else if (products.length === 1 && shipFee === 0 && voucher === 0 && discount === 0 && !isTransferChecked) {
-        finalText += `TC : ${totalAmount}K`; // Trường hợp 1 sản phẩm, không CK
+        finalText += `TC : ${totalAmount}K`;
     } else {
-        finalText += `TC : ${totalExpression} = ${finalTotal}K`; // Hiển thị công thức nếu có giá trị khác 0
+        let displayTotal = finalTotal >= 0 ? finalTotal : 0;
+        finalText += `TC : ${totalExpression} = ${displayTotal}K`;
     }
 
     if (isTransferChecked) {
@@ -520,7 +525,13 @@ document.querySelector('.create-btn').addEventListener('click', function () {
             finalText += " (CHUYỂN KHOẢN)";
         }
     } else {
-        if (shipFee === 0) finalText += " (miễn ship)";
+        if (shipFee === 0) {
+            finalText += " (miễn ship)";
+        }
+        // Thêm (nợ -[số tiền]) nếu finalTotal < 0, bất kể phí ship
+        if (finalTotal < 0) {
+            finalText += ` (nợ ${finalTotal}K)`;
+        }
     }
 
     finalText += " ạ";
@@ -730,3 +741,7 @@ function cleanOldOrders() {
         console.error("Lỗi khi truy vấn orderHistory trên Firestore:", error);
     });
 }
+
+document.getElementById("check-24").addEventListener("change", function () {
+    updateTotals(); // Cập nhật thành tiền khi checkbox thay đổi
+});
