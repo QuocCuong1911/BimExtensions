@@ -307,6 +307,10 @@ document.querySelector(".search-bar-order input").addEventListener("input", func
     }
     const queryTerms = query.split(" ").filter(term => term.trim() !== "");
     const filteredProducts = productList.filter(product => {
+        // Loại bỏ sản phẩm có kích thước "0" (maTim hoặc tenHienThi chứa "-0")
+        if (product.maTim.toLowerCase().endsWith("-0") || product.tenHienThi.toLowerCase().includes("-0")) {
+            return false;
+        }
         return queryTerms.every(term => {
             return (
                 product.maTim.toLowerCase().includes(term) ||
